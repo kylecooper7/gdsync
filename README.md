@@ -1,21 +1,42 @@
 # gdsync
 
-A CLI tool that syncs Google Docs to a local `content.txt` file. AI agents can read and edit documents without touching the Google Docs API directly.
+A CLI tool that lets AI agents read and edit Google Docs. The agent works with a simple local file — the sync engine handles all the Google Docs API complexity.
+
+## Install
+
+**Add to your AI agent (Claude Code, etc.):**
+
+> [**Download gdsync-skill.zip**](https://github.com/kylecooper7/gdsync/releases/latest/download/gdsync-skill.zip) — add this skill to your agent
+
+**Install the CLI:**
+
+```bash
+npm install -g @gdsync/gdsync
+```
+
+---
+
+## How It Works
 
 ```
-gdsync fetch    # pull doc into content.txt
-# edit content.txt (or let an AI agent edit it)
-gdsync commit   # push changes to Google Docs
+gdsync fetch    # pull Google Doc into content.txt
+# agent edits content.txt
+gdsync commit   # push changes to the live Google Doc
 ```
+
+The agent sees a clean markdown-like file. The user sees their Google Doc update in real time.
 
 ---
 
 ## Quick Start
 
 ```bash
-npm install -g gdsync
-cd /path/to/your/project
-gdsync init --doc <documentId>
+gdsync setup                    # create your GCP project (guided wizard)
+gdsync setup check              # confirm setup is complete
+gdsync auth                     # sign in for document access
+gdsync auth check               # confirm sign-in
+gdsync docs                     # list available Google Docs
+gdsync init --doc <documentId>  # start editing a doc
 ```
 
 The document ID is the long string in the Google Docs URL:
