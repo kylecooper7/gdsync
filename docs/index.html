@@ -7,33 +7,35 @@
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { font-family: system-ui, -apple-system, sans-serif; background: #f8f9fa; color: #202124; line-height: 1.7; }
-.hero { background: white; padding: 4rem 2rem; text-align: center; border-bottom: 1px solid #e8eaed; }
-.hero h1 { font-size: 2.5rem; margin-bottom: 0.5rem; }
-.hero p { font-size: 1.2rem; color: #5f6368; max-width: 600px; margin: 0 auto 2rem; }
+a { color: #1a6fe8; }
+.hero { background: white; padding: 3rem 2rem 3.5rem; text-align: center; border-bottom: 1px solid #e8eaed; }
+.hero img { width: 80px; height: 80px; margin-bottom: 1rem; }
+.hero h1 { font-size: 2.25rem; margin-bottom: 0.5rem; background: linear-gradient(135deg, #1a6fe8, #5b4cc4); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.hero p { font-size: 1.15rem; color: #5f6368; max-width: 560px; margin: 0 auto 2rem; }
 .buttons { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
-.btn { display: inline-block; padding: 0.75rem 1.5rem; border-radius: 6px; text-decoration: none; font-weight: 500; font-size: 1rem; }
-.btn-primary { background: #1a73e8; color: white; }
-.btn-primary:hover { background: #1557b0; }
-.btn-secondary { background: white; color: #1a73e8; border: 1px solid #dadce0; }
-.btn-secondary:hover { background: #f1f3f4; }
-.container { max-width: 720px; margin: 0 auto; padding: 3rem 2rem; }
-.how-it-works { background: white; border-radius: 12px; padding: 2rem; margin-bottom: 2rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
-.how-it-works h2 { margin-bottom: 1rem; }
-pre { background: #1e1e1e; color: #d4d4d4; padding: 1.25rem; border-radius: 8px; overflow-x: auto; font-size: 0.9rem; line-height: 1.5; margin: 1rem 0; }
-.features { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 2rem 0; }
-.feature { background: white; border-radius: 8px; padding: 1.25rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
-.feature h3 { font-size: 1rem; margin-bottom: 0.25rem; }
-.feature p { font-size: 0.9rem; color: #5f6368; }
+.btn { display: inline-block; padding: 0.7rem 1.5rem; border-radius: 6px; text-decoration: none; font-weight: 500; font-size: 1rem; transition: opacity 0.15s; }
+.btn:hover { opacity: 0.85; }
+.btn-primary { background: linear-gradient(135deg, #1a6fe8, #5b4cc4); color: white; }
+.btn-secondary { background: white; color: #1a6fe8; border: 1px solid #dadce0; }
+.container { max-width: 700px; margin: 0 auto; padding: 2.5rem 2rem; }
+.card { background: white; border-radius: 12px; padding: 1.75rem; margin-bottom: 1.5rem; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+.card h2 { margin-bottom: 0.75rem; font-size: 1.2rem; }
+pre { background: #1e1e1e; color: #d4d4d4; padding: 1.25rem; border-radius: 8px; overflow-x: auto; font-size: 0.875rem; line-height: 1.6; margin: 0.75rem 0; }
+.features { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1.5rem 0; }
+.feature { background: white; border-radius: 8px; padding: 1.15rem; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+.feature h3 { font-size: 0.95rem; margin-bottom: 0.2rem; color: #202124; }
+.feature p { font-size: 0.85rem; color: #5f6368; margin: 0; }
 footer { text-align: center; padding: 2rem; color: #5f6368; font-size: 0.85rem; }
-footer a { color: #1a73e8; text-decoration: none; }
+footer a { color: #1a6fe8; text-decoration: none; }
 @media (max-width: 600px) { .features { grid-template-columns: 1fr; } .hero h1 { font-size: 1.75rem; } }
 </style>
 </head>
 <body>
 
 <div class="hero">
+  <img src="logo.png" alt="gdsync logo">
   <h1>gdsync</h1>
-  <p>Let AI agents read and edit Google Docs through a simple CLI. No API complexity, no token juggling — just fetch, edit, commit.</p>
+  <p>Let AI agents read and edit Google Docs through a simple CLI. No API complexity — just fetch, edit, commit.</p>
   <div class="buttons">
     <a class="btn btn-primary" href="https://github.com/kylecooper7/gdsync/releases/latest/download/gdsync-skill.zip">Download Skill</a>
     <a class="btn btn-secondary" href="https://github.com/kylecooper7/gdsync">View on GitHub</a>
@@ -41,43 +43,25 @@ footer a { color: #1a73e8; text-decoration: none; }
 </div>
 
 <div class="container">
-  <div class="how-it-works">
+  <div class="card">
     <h2>How it works</h2>
     <p>gdsync syncs a Google Doc to a local file. The agent edits the file, runs a command, and changes appear in the live document.</p>
     <pre>gdsync fetch    # pull Google Doc into content.txt
 # agent edits content.txt
 gdsync commit   # push changes to the live doc</pre>
-    <p>The sync engine handles all the complexity — Google Docs API, formatting, character indexes, named ranges, images, tables, lists, and comments.</p>
+    <p>The sync engine handles formatting, character indexes, named ranges, images, tables, lists, and comments.</p>
   </div>
 
   <div class="features">
-    <div class="feature">
-      <h3>Agent-friendly auth</h3>
-      <p>Non-blocking two-step setup. No background processes or interactive prompts.</p>
-    </div>
-    <div class="feature">
-      <h3>Your own GCP project</h3>
-      <p>Each user gets their own Google Cloud project. gdsync never accesses your files.</p>
-    </div>
-    <div class="feature">
-      <h3>Full document editing</h3>
-      <p>Paragraphs, headings, lists, tables, images, inline formatting — all via clean markdown.</p>
-    </div>
-    <div class="feature">
-      <h3>Comments</h3>
-      <p>Read, reply to, and create comment threads. Agents can address feedback directly.</p>
-    </div>
-    <div class="feature">
-      <h3>Suggestions mode</h3>
-      <p>Visual tracked changes — old text strikethrough, new text in red. Let users review before accepting.</p>
-    </div>
-    <div class="feature">
-      <h3>Doc discovery</h3>
-      <p>List and search accessible docs, including shared files. No document ID needed.</p>
-    </div>
+    <div class="feature"><h3>Agent-friendly auth</h3><p>Non-blocking two-step setup. No background processes.</p></div>
+    <div class="feature"><h3>Your own GCP project</h3><p>Each user gets their own project. gdsync never accesses your files.</p></div>
+    <div class="feature"><h3>Full document editing</h3><p>Paragraphs, headings, lists, tables, images, inline formatting.</p></div>
+    <div class="feature"><h3>Comments</h3><p>Read, reply to, and create comment threads.</p></div>
+    <div class="feature"><h3>Suggestions mode</h3><p>Visual tracked changes — strikethrough old, red new.</p></div>
+    <div class="feature"><h3>Doc discovery</h3><p>List and search accessible docs including shared files.</p></div>
   </div>
 
-  <div class="how-it-works">
+  <div class="card">
     <h2>Quick start</h2>
     <pre>npm install -g @gdsync/gdsync
 
