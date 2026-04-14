@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Privacy Policy — gdsync</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: system-ui, -apple-system, sans-serif; background: #f8f9fa; color: #202124; line-height: 1.7; }
+header { background: white; padding: 1.5rem 2rem; border-bottom: 1px solid #e8eaed; }
+header a { color: #1a73e8; text-decoration: none; font-weight: 500; }
+.container { max-width: 720px; margin: 0 auto; padding: 3rem 2rem; }
+h1 { font-size: 2rem; margin-bottom: 0.5rem; }
+.updated { color: #5f6368; margin-bottom: 2rem; }
+h2 { font-size: 1.25rem; margin: 2rem 0 0.75rem; }
+p, li { margin-bottom: 0.75rem; }
+ul { padding-left: 1.5rem; }
+footer { text-align: center; padding: 2rem; color: #5f6368; font-size: 0.85rem; }
+footer a { color: #1a73e8; text-decoration: none; }
+</style>
+</head>
+<body>
+
+<header><a href="index.html">gdsync</a></header>
+
+<div class="container">
+  <h1>Privacy Policy</h1>
+  <p class="updated">Last updated: April 14, 2026</p>
+
+  <h2>What gdsync does</h2>
+  <p>gdsync is an open-source CLI tool that syncs Google Docs to a local file for editing. It connects to Google's APIs on your behalf to read and modify documents you have access to.</p>
+
+  <h2>Data we access</h2>
+  <p>When you authenticate with gdsync, the tool accesses:</p>
+  <ul>
+    <li><strong>Google Docs</strong> — to read and write document content for documents you explicitly open with gdsync</li>
+    <li><strong>Google Drive</strong> — to list your accessible documents, read and create comments, and upload images</li>
+    <li><strong>Basic profile info</strong> — your name and email address, used to identify your account in the CLI</li>
+  </ul>
+
+  <h2>Data we store</h2>
+  <p><strong>On your machine:</strong> OAuth tokens are stored locally at <code>~/.gdsync/credentials.json</code>. Document content is stored in <code>content.txt</code> in your working directory. These files never leave your machine.</p>
+  <p><strong>On our servers:</strong> During the setup and authentication process, the gdsync auth proxy (a Cloudflare Worker) temporarily handles OAuth token exchange. Tokens are stored in Cloudflare KV for up to 5 minutes during the sign-in flow, then automatically deleted. We do not retain any tokens, document content, or personal data after the auth flow completes.</p>
+
+  <h2>Data we do NOT access</h2>
+  <ul>
+    <li>We do not read, store, or transmit the content of your Google Docs on any server</li>
+    <li>We do not access documents other than those you explicitly open with gdsync</li>
+    <li>We do not share any data with third parties</li>
+    <li>We do not use your data for advertising, analytics, or training</li>
+  </ul>
+
+  <h2>Your own GCP project</h2>
+  <p>gdsync requires each user to create their own Google Cloud project. This means your API calls go through your own project — gdsync's infrastructure never has ongoing access to your documents. The auth proxy is only involved during the initial sign-in.</p>
+
+  <h2>Open source</h2>
+  <p>gdsync is open source. You can review the complete CLI source code at <a href="https://github.com/kylecooper7/gdsync">github.com/kylecooper7/gdsync</a> to verify exactly what data is accessed and how.</p>
+
+  <h2>Data deletion</h2>
+  <p>To revoke gdsync's access, remove the app from your Google account at <a href="https://myaccount.google.com/permissions">myaccount.google.com/permissions</a>. To delete local data, remove <code>~/.gdsync/</code> and any working directories.</p>
+
+  <h2>Contact</h2>
+  <p>For questions about this privacy policy, open an issue at <a href="https://github.com/kylecooper7/gdsync/issues">github.com/kylecooper7/gdsync/issues</a>.</p>
+</div>
+
+<footer>
+  <a href="index.html">Home</a> &middot;
+  <a href="terms.html">Terms of Service</a> &middot;
+  <a href="https://github.com/kylecooper7/gdsync">GitHub</a>
+</footer>
+
+</body>
+</html>

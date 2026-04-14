@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>gdsync — Google Docs for AI Agents</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: system-ui, -apple-system, sans-serif; background: #f8f9fa; color: #202124; line-height: 1.7; }
+.hero { background: white; padding: 4rem 2rem; text-align: center; border-bottom: 1px solid #e8eaed; }
+.hero h1 { font-size: 2.5rem; margin-bottom: 0.5rem; }
+.hero p { font-size: 1.2rem; color: #5f6368; max-width: 600px; margin: 0 auto 2rem; }
+.buttons { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+.btn { display: inline-block; padding: 0.75rem 1.5rem; border-radius: 6px; text-decoration: none; font-weight: 500; font-size: 1rem; }
+.btn-primary { background: #1a73e8; color: white; }
+.btn-primary:hover { background: #1557b0; }
+.btn-secondary { background: white; color: #1a73e8; border: 1px solid #dadce0; }
+.btn-secondary:hover { background: #f1f3f4; }
+.container { max-width: 720px; margin: 0 auto; padding: 3rem 2rem; }
+.how-it-works { background: white; border-radius: 12px; padding: 2rem; margin-bottom: 2rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+.how-it-works h2 { margin-bottom: 1rem; }
+pre { background: #1e1e1e; color: #d4d4d4; padding: 1.25rem; border-radius: 8px; overflow-x: auto; font-size: 0.9rem; line-height: 1.5; margin: 1rem 0; }
+.features { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 2rem 0; }
+.feature { background: white; border-radius: 8px; padding: 1.25rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+.feature h3 { font-size: 1rem; margin-bottom: 0.25rem; }
+.feature p { font-size: 0.9rem; color: #5f6368; }
+footer { text-align: center; padding: 2rem; color: #5f6368; font-size: 0.85rem; }
+footer a { color: #1a73e8; text-decoration: none; }
+@media (max-width: 600px) { .features { grid-template-columns: 1fr; } .hero h1 { font-size: 1.75rem; } }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <h1>gdsync</h1>
+  <p>Let AI agents read and edit Google Docs through a simple CLI. No API complexity, no token juggling — just fetch, edit, commit.</p>
+  <div class="buttons">
+    <a class="btn btn-primary" href="https://github.com/kylecooper7/gdsync/releases/latest/download/gdsync-skill.zip">Download Skill</a>
+    <a class="btn btn-secondary" href="https://github.com/kylecooper7/gdsync">View on GitHub</a>
+  </div>
+</div>
+
+<div class="container">
+  <div class="how-it-works">
+    <h2>How it works</h2>
+    <p>gdsync syncs a Google Doc to a local file. The agent edits the file, runs a command, and changes appear in the live document.</p>
+    <pre>gdsync fetch    # pull Google Doc into content.txt
+# agent edits content.txt
+gdsync commit   # push changes to the live doc</pre>
+    <p>The sync engine handles all the complexity — Google Docs API, formatting, character indexes, named ranges, images, tables, lists, and comments.</p>
+  </div>
+
+  <div class="features">
+    <div class="feature">
+      <h3>Agent-friendly auth</h3>
+      <p>Non-blocking two-step setup. No background processes or interactive prompts.</p>
+    </div>
+    <div class="feature">
+      <h3>Your own GCP project</h3>
+      <p>Each user gets their own Google Cloud project. gdsync never accesses your files.</p>
+    </div>
+    <div class="feature">
+      <h3>Full document editing</h3>
+      <p>Paragraphs, headings, lists, tables, images, inline formatting — all via clean markdown.</p>
+    </div>
+    <div class="feature">
+      <h3>Comments</h3>
+      <p>Read, reply to, and create comment threads. Agents can address feedback directly.</p>
+    </div>
+    <div class="feature">
+      <h3>Suggestions mode</h3>
+      <p>Visual tracked changes — old text strikethrough, new text in red. Let users review before accepting.</p>
+    </div>
+    <div class="feature">
+      <h3>Doc discovery</h3>
+      <p>List and search accessible docs, including shared files. No document ID needed.</p>
+    </div>
+  </div>
+
+  <div class="how-it-works">
+    <h2>Quick start</h2>
+    <pre>npm install -g @gdsync/gdsync
+
+gdsync setup          # create GCP project (guided wizard)
+gdsync setup check    # confirm setup
+gdsync auth           # sign in for document access
+gdsync auth check     # confirm sign-in
+gdsync docs           # list available docs
+gdsync init --doc ID  # start editing</pre>
+  </div>
+</div>
+
+<footer>
+  <a href="https://github.com/kylecooper7/gdsync">GitHub</a> &middot;
+  <a href="https://www.npmjs.com/package/@gdsync/gdsync">npm</a> &middot;
+  <a href="privacy.html">Privacy Policy</a> &middot;
+  <a href="terms.html">Terms of Service</a>
+</footer>
+
+</body>
+</html>
