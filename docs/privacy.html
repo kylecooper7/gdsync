@@ -13,8 +13,11 @@ header a { color: #1a73e8; text-decoration: none; font-weight: 500; }
 h1 { font-size: 2rem; margin-bottom: 0.5rem; }
 .updated { color: #5f6368; margin-bottom: 2rem; }
 h2 { font-size: 1.25rem; margin: 2rem 0 0.75rem; }
+h3 { font-size: 1.1rem; margin: 1.5rem 0 0.5rem; }
 p, li { margin-bottom: 0.75rem; }
-ul { padding-left: 1.5rem; }
+ul, ol { padding-left: 1.5rem; }
+code { background: #f1f3f4; padding: 0.15rem 0.4rem; border-radius: 3px; font-size: 0.9em; }
+a { color: #1a73e8; }
 footer { text-align: center; padding: 2rem; color: #5f6368; font-size: 0.85rem; }
 footer a { color: #1a73e8; text-decoration: none; }
 </style>
@@ -24,50 +27,95 @@ footer a { color: #1a73e8; text-decoration: none; }
 <header><a href="index.html">gdsync</a></header>
 
 <div class="container">
-  <h1>Privacy Policy</h1>
-  <p class="updated">Last updated: April 14, 2026</p>
+<h1>Privacy Policy</h1>
+<p class="updated">Last updated: April 14, 2026</p>
 
-  <h2>What gdsync does</h2>
-  <p>gdsync is an open-source CLI tool that syncs Google Docs to a local file for editing. It connects to Google's APIs on your behalf to read and modify documents you have access to.</p>
+<h2>1. Introduction</h2>
+<p>This Privacy Policy describes how gdsync ("the Software," "we," "our") collects, uses, and handles your information when you use the gdsync command-line tool and its associated authentication proxy service. gdsync is an open-source CLI tool that synchronizes Google Docs with local files for editing. It connects to Google's APIs on your behalf to read and modify documents you have authorized access to.</p>
+<p>By using gdsync, you acknowledge that you have read and understood this Privacy Policy.</p>
 
-  <h2>Data we access</h2>
-  <p>When you authenticate with gdsync, the tool accesses:</p>
-  <ul>
-    <li><strong>Google Docs</strong> — to read and write document content for documents you explicitly open with gdsync</li>
-    <li><strong>Google Drive</strong> — to list your accessible documents, read and create comments, and upload images</li>
-    <li><strong>Basic profile info</strong> — your name and email address, used to identify your account in the CLI</li>
-  </ul>
+<h2>2. Data We Access</h2>
+<p>When you authenticate with gdsync, the Software accesses the following through Google's APIs using the permissions (OAuth scopes) you grant:</p>
+<ul>
+<li><strong>Google Docs</strong> — to read and write document content for documents you explicitly open with gdsync;</li>
+<li><strong>Google Drive</strong> — to list your accessible documents, read and create comments, and upload images;</li>
+<li><strong>Basic profile information</strong> — your name and email address, used solely to identify your account within the CLI.</li>
+</ul>
+<p>gdsync requests only the minimum OAuth scopes necessary to perform its core functionality. The Software does not request or access data beyond the scopes listed above.</p>
 
-  <h2>Data we store</h2>
-  <p><strong>On your machine:</strong> OAuth tokens are stored locally at <code>~/.gdsync/credentials.json</code>. Document content is stored in <code>content.txt</code> in your working directory. These files never leave your machine.</p>
-  <p><strong>On our servers:</strong> During the setup and authentication process, the gdsync auth proxy (a Cloudflare Worker) temporarily handles OAuth token exchange. Tokens are stored in Cloudflare KV for up to 5 minutes during the sign-in flow, then automatically deleted. We do not retain any tokens, document content, or personal data after the auth flow completes.</p>
+<h2>3. Data We Store</h2>
+<h3>3.1 On Your Machine</h3>
+<ul>
+<li><strong>OAuth tokens</strong> are stored locally at <code>~/.gdsync/credentials.json</code>.</li>
+<li><strong>Document content</strong> is stored in <code>content.txt</code> in your working directory.</li>
+</ul>
+<p>These files reside entirely on your local machine and are never transmitted to any server controlled by the gdsync maintainers.</p>
 
-  <h2>Data we do NOT access</h2>
-  <ul>
-    <li>We do not read, store, or transmit the content of your Google Docs on any server</li>
-    <li>We do not access documents other than those you explicitly open with gdsync</li>
-    <li>We do not share any data with third parties</li>
-    <li>We do not use your data for advertising, analytics, or training</li>
-  </ul>
+<h3>3.2 On Our Infrastructure</h3>
+<p>During the initial authentication flow, the gdsync auth proxy (hosted as a Cloudflare Worker) temporarily facilitates OAuth token exchange. Specifically:</p>
+<ul>
+<li>OAuth tokens are held in Cloudflare KV storage for a maximum of <strong>5 minutes</strong> during the sign-in flow;</li>
+<li>Tokens are automatically deleted after this window expires;</li>
+<li>No tokens, document content, personal data, or usage information is retained after the authentication flow completes.</li>
+</ul>
+<p>The auth proxy is involved <strong>only</strong> during initial sign-in. It has no ongoing access to your Google account, documents, or API calls.</p>
 
-  <h2>Your own GCP project</h2>
-  <p>gdsync requires each user to create their own Google Cloud project. This means your API calls go through your own project — gdsync's infrastructure never has ongoing access to your documents. The auth proxy is only involved during the initial sign-in.</p>
+<h2>4. Data We Do NOT Collect</h2>
+<ul>
+<li>We do not read, store, log, or transmit the content of your Google Docs on any server;</li>
+<li>We do not access documents other than those you explicitly open with gdsync;</li>
+<li>We do not collect telemetry, usage analytics, crash reports, or diagnostic data;</li>
+<li>We do not share, sell, rent, or disclose any user data to third parties;</li>
+<li>We do not use your data for advertising, profiling, marketing, or model training;</li>
+<li>We do not track your IP address, device information, or browsing activity.</li>
+</ul>
 
-  <h2>Open source</h2>
-  <p>gdsync is open source. You can review the complete CLI source code at <a href="https://github.com/kylecooper7/gdsync">github.com/kylecooper7/gdsync</a> to verify exactly what data is accessed and how.</p>
+<h2>5. Your Google Cloud Project</h2>
+<p>gdsync requires each user to create and configure their own Google Cloud Platform project. As a result:</p>
+<ul>
+<li>All Google API calls are made through <strong>your own</strong> GCP project, using your own API quota and credentials;</li>
+<li>The gdsync maintainers' infrastructure never has persistent or ongoing access to your Google account or documents;</li>
+<li>You are responsible for the configuration and security of your GCP project in accordance with Google's policies.</li>
+</ul>
 
-  <h2>Data deletion</h2>
-  <p>To revoke gdsync's access, remove the app from your Google account at <a href="https://myaccount.google.com/permissions">myaccount.google.com/permissions</a>. To delete local data, remove <code>~/.gdsync/</code> and any working directories.</p>
+<h2>6. Third-Party Services</h2>
+<p>gdsync interacts with the following third-party services:</p>
+<ul>
+<li><strong>Google APIs</strong> (Docs, Drive, OAuth) — governed by <a href="https://policies.google.com/privacy">Google's Privacy Policy</a> and <a href="https://developers.google.com/terms/api-services-user-data-policy">Google API Services User Data Policy</a>;</li>
+<li><strong>Cloudflare Workers and KV</strong> (auth proxy only) — governed by <a href="https://www.cloudflare.com/privacypolicy/">Cloudflare's Privacy Policy</a>.</li>
+</ul>
+<p>We encourage you to review the privacy policies of these services. gdsync's use and transfer of information received from Google APIs adheres to the <a href="https://developers.google.com/terms/api-services-user-data-policy">Google API Services User Data Policy</a>, including the Limited Use requirements.</p>
 
-  <h2>Contact</h2>
-  <p>For questions about this privacy policy, open an issue at <a href="https://github.com/kylecooper7/gdsync/issues">github.com/kylecooper7/gdsync/issues</a>.</p>
+<h2>7. Data Retention and Deletion</h2>
+<p>gdsync does not maintain any persistent user data on its infrastructure. To fully revoke access and delete your data:</p>
+<ol>
+<li><strong>Revoke OAuth access</strong> — remove gdsync from your Google account at <a href="https://myaccount.google.com/permissions">myaccount.google.com/permissions</a>;</li>
+<li><strong>Delete local credentials</strong> — remove the <code>~/.gdsync/</code> directory;</li>
+<li><strong>Delete local document files</strong> — remove any <code>content.txt</code> files or working directories created by gdsync.</li>
+</ol>
+<p>After completing these steps, no data associated with your use of gdsync will remain on your machine or on any server controlled by the gdsync maintainers.</p>
+
+<h2>8. Security</h2>
+<p>gdsync uses OAuth 2.0 for authentication and does not handle or store your Google account password at any point. OAuth tokens are stored locally with your operating system's default file permissions. We recommend ensuring that your <code>~/.gdsync/</code> directory is accessible only to your user account.</p>
+<p>The auth proxy communicates exclusively over HTTPS. Temporary token storage in Cloudflare KV is subject to Cloudflare's infrastructure security controls.</p>
+
+<h2>9. Children's Privacy</h2>
+<p>gdsync is a developer tool and is not directed at children under the age of 13 (or the applicable age of digital consent in your jurisdiction). We do not knowingly collect personal information from children.</p>
+
+<h2>10. Open Source Transparency</h2>
+<p>gdsync is open source. You can review the complete source code at <a href="https://github.com/kylecooper7/gdsync">github.com/kylecooper7/gdsync</a> to independently verify what data is accessed, how it is handled, and what network requests are made.</p>
+
+<h2>11. Changes to This Policy</h2>
+<p>We may update this Privacy Policy from time to time. Material changes will be reflected by updating the "Last updated" date at the top of this page. Your continued use of gdsync after any modification constitutes acceptance of the revised Privacy Policy.</p>
+
+<h2>12. Contact</h2>
+<p>For questions about this Privacy Policy, open an issue at <a href="https://github.com/kylecooper7/gdsync/issues">github.com/kylecooper7/gdsync/issues</a>.</p>
 </div>
 
 <footer>
-  <a href="index.html">Home</a> &middot;
-  <a href="terms.html">Terms of Service</a> &middot;
-  <a href="https://github.com/kylecooper7/gdsync">GitHub</a>
+<a href="index.html">Home</a> &middot;
+<a href="terms.html">Terms of Service</a> &middot;
+<a href="https://github.com/kylecooper7/gdsync">GitHub</a>
 </footer>
-
 </body>
 </html>

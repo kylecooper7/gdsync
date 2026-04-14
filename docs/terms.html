@@ -14,7 +14,8 @@ h1 { font-size: 2rem; margin-bottom: 0.5rem; }
 .updated { color: #5f6368; margin-bottom: 2rem; }
 h2 { font-size: 1.25rem; margin: 2rem 0 0.75rem; }
 p, li { margin-bottom: 0.75rem; }
-ul { padding-left: 1.5rem; }
+ul, ol { padding-left: 1.5rem; }
+a { color: #1a73e8; }
 footer { text-align: center; padding: 2rem; color: #5f6368; font-size: 0.85rem; }
 footer a { color: #1a73e8; text-decoration: none; }
 </style>
@@ -24,50 +25,73 @@ footer a { color: #1a73e8; text-decoration: none; }
 <header><a href="index.html">gdsync</a></header>
 
 <div class="container">
-  <h1>Terms of Service</h1>
-  <p class="updated">Last updated: April 14, 2026</p>
+<h1>Terms of Service</h1>
+<p class="updated">Last updated: April 14, 2026</p>
 
-  <h2>Acceptance</h2>
-  <p>By using gdsync, you agree to these terms. If you don't agree, don't use the tool.</p>
+<h2>1. Acceptance of Terms</h2>
+<p>By downloading, installing, or using gdsync ("the Software"), you agree to be bound by these Terms of Service ("Terms"). If you do not agree to these Terms, do not use the Software.</p>
 
-  <h2>What gdsync is</h2>
-  <p>gdsync is a free, open-source CLI tool that syncs Google Docs to local files for editing. It is provided as-is for use by developers and AI agents.</p>
+<h2>2. Description of the Software</h2>
+<p>gdsync is a free, open-source command-line tool that synchronizes Google Docs with local files for editing. It is provided as-is for use by developers and AI agents. gdsync is not affiliated with, endorsed by, or sponsored by Google LLC.</p>
 
-  <h2>Your responsibilities</h2>
-  <ul>
-    <li>You are responsible for the Google account you use with gdsync and all actions taken through it</li>
-    <li>You are responsible for the content you create, edit, or delete in Google Docs via gdsync</li>
-    <li>You must comply with Google's <a href="https://policies.google.com/terms">Terms of Service</a> and <a href="https://developers.google.com/terms/api-services-user-data-policy">API Services User Data Policy</a></li>
-    <li>You must not use gdsync to access documents you don't have permission to view or edit</li>
-  </ul>
+<h2>3. User Responsibilities</h2>
+<p>You are solely responsible for:</p>
+<ul>
+<li>The Google account you authenticate with gdsync and all actions taken through that account;</li>
+<li>All content you create, edit, delete, or otherwise modify in Google Docs via gdsync;</li>
+<li>Ensuring your use of gdsync complies with <a href="https://policies.google.com/terms">Google's Terms of Service</a> and <a href="https://developers.google.com/terms/api-services-user-data-policy">Google API Services User Data Policy</a>;</li>
+<li>Maintaining the security of your authentication credentials and access tokens.</li>
+</ul>
+<p>You must not use gdsync to access, modify, or exfiltrate documents for which you do not have authorized permission.</p>
 
-  <h2>Your GCP project</h2>
-  <p>gdsync requires you to create your own Google Cloud project. You are responsible for your GCP project, its configuration, and any costs associated with it (Google's APIs used by gdsync are free, but other GCP services are not).</p>
+<h2>4. Google Cloud Project</h2>
+<p>gdsync requires you to create and configure your own Google Cloud Platform ("GCP") project. You are solely responsible for your GCP project, its configuration, its compliance with Google's policies, and any costs incurred through its use. While the Google APIs used by gdsync are generally available at no cost, other GCP services and usage tiers may incur charges for which you are responsible.</p>
 
-  <h2>Auth proxy</h2>
-  <p>gdsync provides an auth proxy service to simplify the initial setup and authentication. This service is provided for convenience and may be modified, rate-limited, or discontinued at any time. The auth proxy does not store your data beyond the brief authentication window.</p>
+<h2>5. Authentication Proxy Service</h2>
+<p>gdsync provides an optional authentication proxy service to simplify initial OAuth setup. This service:</p>
+<ul>
+<li>Is provided solely for convenience and without any guarantee of availability;</li>
+<li>May be modified, rate-limited, suspended, or discontinued at any time without notice;</li>
+<li>Does not persistently store your credentials, tokens, or document data beyond the brief authentication window necessary to complete the OAuth flow.</li>
+</ul>
+<p>Use of the auth proxy is optional. You may configure gdsync to authenticate directly through your own GCP project's OAuth credentials.</p>
 
-  <h2>No warranty</h2>
-  <p>gdsync is provided "as is" without warranty of any kind, express or implied. We do not guarantee that the tool will be error-free, uninterrupted, or compatible with all documents or Google API changes.</p>
+<h2>6. Privacy and Data Handling</h2>
+<p>gdsync operates locally on your machine. The Software does not collect, transmit, or store telemetry, usage data, or document content to any server controlled by the gdsync maintainers, except as described in Section 5 regarding the optional auth proxy.</p>
 
-  <h2>Limitation of liability</h2>
-  <p>To the fullest extent permitted by law, the gdsync maintainers shall not be liable for any damages arising from the use of this tool, including but not limited to data loss, document corruption, or unauthorized access resulting from misconfiguration.</p>
+<h2>7. Disclaimer of Warranties</h2>
+<p>THE SOFTWARE IS PROVIDED "AS IS" AND "AS AVAILABLE," WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, TITLE, AND NON-INFRINGEMENT. THE GDSYNC MAINTAINERS DO NOT WARRANT THAT THE SOFTWARE WILL BE ERROR-FREE, UNINTERRUPTED, SECURE, OR COMPATIBLE WITH ALL DOCUMENTS, SYSTEMS, OR CHANGES TO THE GOOGLE API.</p>
 
-  <h2>Changes</h2>
-  <p>These terms may be updated at any time. Continued use of gdsync after changes constitutes acceptance. Check this page for the latest version.</p>
+<h2>8. Limitation of Liability</h2>
+<p>TO THE FULLEST EXTENT PERMITTED BY APPLICABLE LAW, IN NO EVENT SHALL THE GDSYNC MAINTAINERS, CONTRIBUTORS, OR LICENSORS BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, OR PUNITIVE DAMAGES, OR ANY LOSS OF DATA, PROFITS, REVENUE, GOODWILL, OR BUSINESS OPPORTUNITY, ARISING OUT OF OR RELATED TO YOUR USE OF OR INABILITY TO USE THE SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.</p>
+<p>IN NO EVENT SHALL THE AGGREGATE LIABILITY OF THE GDSYNC MAINTAINERS EXCEED THE AMOUNT YOU PAID FOR THE SOFTWARE (WHICH IS ZERO).</p>
 
-  <h2>License</h2>
-  <p>gdsync is released under the <a href="https://github.com/kylecooper7/gdsync/blob/main/LICENSE">MIT License</a>.</p>
+<h2>9. Indemnification</h2>
+<p>You agree to indemnify, defend, and hold harmless the gdsync maintainers and contributors from and against any claims, liabilities, damages, losses, and expenses (including reasonable attorneys' fees) arising out of or related to your use of the Software, your violation of these Terms, or your violation of any third-party rights.</p>
 
-  <h2>Contact</h2>
-  <p>For questions, open an issue at <a href="https://github.com/kylecooper7/gdsync/issues">github.com/kylecooper7/gdsync/issues</a>.</p>
+<h2>10. Modifications to Terms</h2>
+<p>These Terms may be updated at any time. Material changes will be reflected by updating the "Last updated" date above. Your continued use of the Software after any modification constitutes acceptance of the revised Terms. It is your responsibility to review these Terms periodically.</p>
+
+<h2>11. Governing Law</h2>
+<p>These Terms shall be governed by and construed in accordance with the laws of the State of Colorado, without regard to its conflict of law provisions.</p>
+
+<h2>12. Severability</h2>
+<p>If any provision of these Terms is held to be invalid or unenforceable, the remaining provisions shall remain in full force and effect.</p>
+
+<h2>13. Entire Agreement</h2>
+<p>These Terms, together with the <a href="https://github.com/kylecooper7/gdsync/blob/main/LICENSE">MIT License</a> under which the Software is released, constitute the entire agreement between you and the gdsync maintainers regarding the Software and supersede all prior agreements and understandings.</p>
+
+<h2>14. License</h2>
+<p>gdsync is released under the <a href="https://github.com/kylecooper7/gdsync/blob/main/LICENSE">MIT License</a>.</p>
+
+<h2>15. Contact</h2>
+<p>For questions about these Terms, open an issue at <a href="https://github.com/kylecooper7/gdsync/issues">github.com/kylecooper7/gdsync/issues</a>.</p>
 </div>
 
 <footer>
-  <a href="index.html">Home</a> &middot;
-  <a href="privacy.html">Privacy Policy</a> &middot;
-  <a href="https://github.com/kylecooper7/gdsync">GitHub</a>
+<a href="index.html">Home</a> &middot;
+<a href="privacy.html">Privacy Policy</a> &middot;
+<a href="https://github.com/kylecooper7/gdsync">GitHub</a>
 </footer>
-
 </body>
 </html>
