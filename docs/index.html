@@ -9,8 +9,8 @@
 body { font-family: system-ui, -apple-system, sans-serif; background: #f8f9fa; color: #202124; line-height: 1.7; }
 a { color: #1a6fe8; }
 .hero { background: white; padding: 3rem 2rem 3.5rem; text-align: center; border-bottom: 1px solid #e8eaed; }
-.hero img { width: 80px; height: 80px; margin-bottom: 1rem; }
-.hero h1 { font-size: 2.25rem; margin-bottom: 0.5rem; background: linear-gradient(135deg, #1a6fe8, #5b4cc4); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.hero .icon { width: 72px; height: auto; margin-bottom: 0.75rem; }
+.hero .logo-text { height: 40px; width: auto; margin-bottom: 0.75rem; }
 .hero p { font-size: 1.15rem; color: #5f6368; max-width: 560px; margin: 0 auto 2rem; }
 .buttons { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
 .btn { display: inline-block; padding: 0.7rem 1.5rem; border-radius: 6px; text-decoration: none; font-weight: 500; font-size: 1rem; transition: opacity 0.15s; }
@@ -33,8 +33,8 @@ footer a { color: #1a6fe8; text-decoration: none; }
 <body>
 
 <div class="hero">
-  <img src="logo.png" alt="gdsync logo">
-  <h1>gdsync</h1>
+  <img class="icon" src="icon.png" alt="">
+  <img class="logo-text" src="logo-text.png" alt="gdsync">
   <p>Let AI agents read and edit Google Docs through a simple CLI. No API complexity — just fetch, edit, commit.</p>
   <div class="buttons">
     <a class="btn btn-primary" href="https://github.com/kylecooper7/gdsync/releases/latest/download/gdsync-skill.zip">Download Skill</a>
