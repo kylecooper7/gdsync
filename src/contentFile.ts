@@ -8,8 +8,13 @@ import { parseListPrefix } from "./lists.js";
 
 // Matches: ---blk_1--- or ---blk_1 token--- or ---blk_1 tok1 tok2---
 const BLOCK_DELIMITER_RE = /^---(blk_\d+)(?:\s+([\w-]+(?:\s+[\w-]+)*))?---$/;
-// Matches: --- (bare, new block)
-const BARE_DELIMITER_RE = /^---$/;
+// Matches bare new-block delimiters (no blk_N ID):
+//   ---
+//   ---paragraph---
+//   --- paragraph ---
+//   --- paragraph text-center ---
+// Must NOT start with blk_ (those are existing block delimiters)
+const BARE_DELIMITER_RE = /^---\s*(?!blk_)([\w-]+(?:\s+[\w-]+)*)?\s*---$|^---$/;
 
 // Block type tokens that can appear in delimiters
 const BLOCK_TYPE_TOKENS: Set<string> = new Set(["paragraph", "list_item", "table", "image"]);
@@ -65,12 +70,15 @@ export function parseContentString(raw: string): Block[] {
   for (const line of lines) {
     lineNum++;
     const blockMatch = line.match(BLOCK_DELIMITER_RE);
-    const isBare = BARE_DELIMITER_RE.test(line);
+    const bareMatch = line.match(BARE_DELIMITER_RE);
 
-    if (blockMatch || isBare) {
+    if (blockMatch || bareMatch) {
       flushBlock();
       const blockId = blockMatch ? blockMatch[1] : null;
-      const tokenStr = blockMatch ? (blockMatch[2] ?? "") : "";
+      // Extract tokens from either format
+      const tokenStr = blockMatch
+        ? (blockMatch[2] ?? "")
+        : (bareMatch && bareMatch[1] ? bareMatch[1] : "");
       const tokens = tokenStr ? tokenStr.split(/\s+/).filter(Boolean) : [];
       currentBlockId = blockId;
       currentTokens = tokens;
