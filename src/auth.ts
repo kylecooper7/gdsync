@@ -19,7 +19,7 @@ const SCOPES = [
 
 // Auth proxy URL — the default path for non-technical users.
 // The proxy holds the OAuth client secret server-side.
-const GDSYNC_AUTH_URL = "https://gdsync-auth.gdsync-dev.workers.dev";
+const GDSYNC_AUTH_URL = "https://auth.gdsync.dev";
 
 // Users can override with their own credentials via file or env vars.
 const CLIENT_SECRET_PATH = path.join(CREDENTIALS_DIR, "client_secret.json");

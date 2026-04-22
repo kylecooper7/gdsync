@@ -174,9 +174,9 @@ npm run dev          # tsc --watch
 
 ## Links
 
-- [Homepage](https://kylecooper7.github.io/gdsync/)
-- [Privacy Policy](https://kylecooper7.github.io/gdsync/privacy.html)
-- [Terms of Service](https://kylecooper7.github.io/gdsync/terms.html)
+- [Homepage](https://gdsync.dev/)
+- [Privacy Policy](https://gdsync.dev/privacy.html)
+- [Terms of Service](https://gdsync.dev/terms.html)
 
 ## License
 
