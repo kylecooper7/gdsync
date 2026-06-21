@@ -1,8 +1,8 @@
 node_modules/
 dist/
 *.tgz
+.npmrc
 
 # Auth proxy
 auth-proxy/node_modules/
 .DS_Store
-.wrangler/

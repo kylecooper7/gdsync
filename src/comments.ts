@@ -10,7 +10,7 @@ import * as fs from "fs";
 import * as path from "path";
 import { google, drive_v3 } from "googleapis";
 import { OAuth2Client } from "google-auth-library";
-import { BlockMap, BlockMapEntry } from "./types.js";
+import { Block, BlockMap, BlockMapEntry } from "./types.js";
 
 // -------------------------------------------------------------------------
 // Types
@@ -301,12 +301,12 @@ export async function resolveComment(
 }
 
 /**
- * Create a new comment on the document.
- * If anchorText is provided, anchors to that specific text within the block.
- * Otherwise anchors to the first line of the block's content.
+ * Create a new comment on the document, anchored to the block's text.
  *
- * For Google Docs, the Drive API anchors comments via quotedFileContent
- * (with mimeType text/plain). The JSON anchor format doesn't work for Docs.
+ * The Drive API anchors comments via quotedFileContent (which must contain
+ * text that actually exists in the document) and an anchor JSON with the
+ * character offset and length. If the quoted text doesn't match real
+ * document content, Google Docs shows "Original content deleted."
  */
 export async function createComment(
   auth: OAuth2Client,
@@ -314,7 +314,8 @@ export async function createComment(
   blockId: string,
   message: string,
   blockMap: BlockMap,
-  anchorText?: string
+  anchorText?: string,
+  fetchedBlocks?: Block[]
 ): Promise<void> {
   const drive = getDriveClient(auth);
 
@@ -323,22 +324,53 @@ export async function createComment(
     throw new Error(`Block ${blockId} not found in block map. Run gdsync fetch first.`);
   }
 
-  // Google Docs does not support anchored comments via the Drive API
-  // (confirmed platform limitation). We set quotedFileContent so the
-  // comment shows the referenced text in a dropdown for context.
+  // Resolve the anchor text: use explicit anchorText, or extract from block content
+  let resolvedAnchor = anchorText;
+  if (!resolvedAnchor && fetchedBlocks) {
+    const block = fetchedBlocks.find((b) => b.blockId === blockId);
+    if (block) {
+      resolvedAnchor = stripMarkdown(block.content);
+    }
+  }
+
   const requestBody: drive_v3.Schema$Comment = {
     content: message,
-    quotedFileContent: {
-      value: anchorText || `[${blockId}]`,
-      mimeType: "text/html",
-    },
   };
+
+  if (resolvedAnchor) {
+    requestBody.quotedFileContent = {
+      value: resolvedAnchor,
+      mimeType: "text/plain",
+    };
+    // Anchor to the block's character range in the document
+    requestBody.anchor = JSON.stringify({
+      r: 0,
+      a: [{ txt: { o: entry.startIndex, l: entry.endIndex - entry.startIndex } }],
+    });
+  }
 
   await drive.comments.create({
     fileId,
     fields: "id",
     requestBody,
   });
+}
+
+/**
+ * Strip markdown syntax to get plain text matching the actual document content.
+ * The result must match what Google Docs stores, or the comment won't anchor.
+ */
+function stripMarkdown(content: string): string {
+  let text = content;
+  // Remove image syntax
+  text = text.replace(/!\[.*?\]\(.*?\)/g, "");
+  // Remove heading markers
+  text = text.replace(/^#+\s*/gm, "");
+  // Remove bold/italic markers
+  text = text.replace(/\*+/g, "");
+  // Remove list markers
+  text = text.replace(/^[-*]\s+/gm, "");
+  return text.trim();
 }
 
 /**

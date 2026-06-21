@@ -871,7 +871,8 @@ commentCmd
         blockId,
         message,
         session.blockMap,
-        options.anchor
+        options.anchor,
+        session.fetchedBlocks
       );
       console.log(`Created comment on ${blockId}.`);
 

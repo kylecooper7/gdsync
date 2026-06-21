@@ -337,6 +337,14 @@ export async function startManualSetup(): Promise<{ sessionId: string; manualUrl
     fs.mkdirSync(CREDENTIALS_DIR, { recursive: true, mode: 0o700 });
   }
 
+  // Register the session with the proxy so it's recognized when the user
+  // submits credentials from the manual setup page
+  await fetch(`${proxyUrl}/api/auth/init`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ session: sessionId }),
+  });
+
   savePendingSession({ sessionId, authUrl: manualUrl, createdAt: new Date().toISOString() });
 
   return { sessionId, manualUrl };
