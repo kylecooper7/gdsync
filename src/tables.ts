@@ -130,7 +130,7 @@ export function validateTableDimensions(
 export function buildTableCellUpdateRequests(
   docTable: docs_v1.Schema$Table,
   changes: CellChange[]
-): docs_v1.Schema$Request[] {
+): { requests: docs_v1.Schema$Request[]; netDelta: number } {
   // Sort changes in reverse document order (highest row/col index first)
   const sortedChanges = [...changes].sort((a, b) => {
     if (b.rowIndex !== a.rowIndex) return b.rowIndex - a.rowIndex;
@@ -138,6 +138,9 @@ export function buildTableCellUpdateRequests(
   });
 
   const requests: docs_v1.Schema$Request[] = [];
+  // Net character change across all cell edits — callers use this to shift the
+  // indices of any content inserted AFTER the table in the same commit.
+  let netDelta = 0;
 
   for (const change of sortedChanges) {
     const row = docTable.tableRows?.[change.rowIndex];
@@ -150,6 +153,7 @@ export function buildTableCellUpdateRequests(
 
     const paraStart = firstPara.startIndex!;
     const paraEnd = firstPara.endIndex!;
+    const oldLen = Math.max(0, paraEnd - 1 - paraStart);
 
     // Delete existing content (preserve mandatory trailing \n)
     if (paraStart < paraEnd - 1) {
@@ -172,9 +176,11 @@ export function buildTableCellUpdateRequests(
         },
       });
     }
+
+    netDelta += (change.newText?.length ?? 0) - oldLen;
   }
 
-  return requests;
+  return { requests, netDelta };
 }
 
 /**

@@ -190,21 +190,22 @@ export async function fetchDocument(
     }
   }
 
-  // Google Docs requires a paragraph after every table, so a table at the very
-  // end of the document leaves a trailing empty paragraph. Empty plain paragraphs
-  // are already skipped above, but if the content before the table was a list, the
-  // filler inherits the bullet and serializes as an empty "- " block. Drop that
-  // trailing filler so content.txt stays clean and table-at-end commits verify.
-  const lastRaw = rawBlocks[rawBlocks.length - 1];
-  const prevRaw = rawBlocks[rawBlocks.length - 2];
-  if (
-    lastRaw &&
-    prevRaw?.type === "table" &&
-    lastRaw.type === "list_item" &&
-    /^\s*([-*]|\d+[.)])\s*$/.test(lastRaw.content)
-  ) {
-    rawBlocks.pop();
-  }
+  // Google Docs requires a paragraph after every table. Empty plain paragraphs
+  // are already skipped above, but if the content before the table was a list,
+  // that mandatory filler inherits the bullet and serializes as an empty "- "
+  // block. Drop any empty list-item that immediately follows a table (it's always
+  // an artifact, never user content) so content.txt stays clean and commits verify.
+  const emptyBullet = /^\s*([-*]|\d+[.)])\s*$/;
+  const dedupedRaw = rawBlocks.filter((raw, i) => {
+    const prev = rawBlocks[i - 1];
+    const isEmptyBulletAfterTable =
+      prev?.type === "table" &&
+      raw.type === "list_item" &&
+      emptyBullet.test(raw.content);
+    return !isEmptyBulletAfterTable;
+  });
+  rawBlocks.length = 0;
+  rawBlocks.push(...dedupedRaw);
 
   // 6. Assign sequential block IDs and build Block objects
   const blocks: Block[] = rawBlocks.map((raw, i) => ({

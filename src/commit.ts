@@ -158,7 +158,7 @@ export async function commitDocument(
         const changes = diffTables(oldParsed, newParsed);
         if (changes.length > 0) {
           const docTable = findTableAtIndex(freshDoc.data, entry.startIndex);
-          if (docTable) insertStyleReqs.push(...buildTableCellUpdateRequests(docTable, changes));
+          if (docTable) insertStyleReqs.push(...buildTableCellUpdateRequests(docTable, changes).requests);
         }
         continue;
       }
@@ -324,9 +324,16 @@ export async function commitDocument(
           const changes = diffTables(oldParsed, newParsed);
           if (changes.length > 0) {
             const docTable = findTableAtIndex(freshDoc.data, entry.startIndex);
-            if (docTable) editRequests.push(...buildTableCellUpdateRequests(docTable, changes));
+            if (docTable) {
+              const { requests: tableReqs, netDelta } = buildTableCellUpdateRequests(docTable, changes);
+              editRequests.push(...tableReqs);
+              // Cell text-length changes shift everything after the table — record
+              // the delta so inserts after the table use correct indices.
+              if (netDelta !== 0) {
+                positionDeltas.push({ position: entry.startIndex, delta: netDelta });
+              }
+            }
           }
-          // Table cell updates don't change paragraph boundaries, no delta
         } else if (block.type === "image") {
           // Skip changed image blocks for now
         } else {
@@ -447,7 +454,7 @@ export async function commitDocument(
       const parsed = parseMarkdownTable(newTableContents[i]);
       const changes = allCellsAsChanges(parsed);
       if (changes.length > 0) {
-        fillRequests.push(...buildTableCellUpdateRequests(emptyDocTables[i], changes));
+        fillRequests.push(...buildTableCellUpdateRequests(emptyDocTables[i], changes).requests);
       }
     }
 
