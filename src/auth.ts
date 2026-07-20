@@ -54,6 +54,17 @@ export function authErrorHint(message: string): string {
   return "";
 }
 
+/**
+ * Message for "can't act yet" states. Distinguishes "never set up" (no GCP
+ * project/credentials) from "set up but not signed in", so users are pointed
+ * at the right first step.
+ */
+export function notReadyMessage(): string {
+  return hasLocalCredentials()
+    ? "Not authenticated. Run `gdsync auth` first."
+    : "Not set up. Run `gdsync setup` first to create your GCP project, then `gdsync auth`.";
+}
+
 function loadLocalClientSecret(): { client_id: string; client_secret: string } | null {
   // Tier 1: User-provided client_secret.json (power users / custom GCP projects)
   if (fs.existsSync(CLIENT_SECRET_PATH)) {
@@ -628,9 +639,7 @@ async function runLocalAuthFlow(
 export async function getAuthClient(): Promise<OAuth2Client> {
   const stored = loadStoredCredentials();
   if (!stored) {
-    const err = new Error(
-      "Not authenticated. Run `gdsync auth` first."
-    ) as Error & { exitCode: number };
+    const err = new Error(notReadyMessage()) as Error & { exitCode: number };
     err.exitCode = 2;
     throw err;
   }

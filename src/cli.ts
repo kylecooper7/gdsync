@@ -16,6 +16,7 @@ import {
   checkSetup,
   hasLocalCredentials,
   authErrorHint,
+  notReadyMessage,
 } from "./auth.js";
 import { fetchDocument } from "./fetch.js";
 import { commitDocument } from "./commit.js";
@@ -73,7 +74,7 @@ program
     try {
       // Step 1: Check auth
       if (!isAuthenticated()) {
-        console.error("Not authenticated. Run `gdsync auth` first.");
+        console.error(notReadyMessage());
         process.exit(2);
       } else {
         console.log("Already authenticated.");
@@ -321,7 +322,7 @@ program
       } catch (authErr) {
         const ae = authErr as Error & { exitCode?: number };
         if (ae.exitCode === 2) {
-          console.error("Not authenticated. Run `gdsync auth` first.");
+          console.error(ae.message);
           process.exit(2);
         }
         throw authErr;
@@ -443,6 +444,17 @@ program
 
       // Save new session state
       saveSession(workDir, verifyResult.newSession);
+
+      if (config.mode === "suggestions") {
+        // Suggestions mode intentionally leaves the document diverged from
+        // content.txt (old text struck through, new text inserted for review),
+        // so a strict content match is expected to differ. Don't treat that as
+        // a failure — the changes are in the doc as suggestions.
+        console.log(
+          "Suggestions added. Review and accept them in Google Docs — the document will differ from the committed text until then."
+        );
+        process.exit(0);
+      }
 
       if (verifyResult.success) {
         console.log("Verified — document matches.");

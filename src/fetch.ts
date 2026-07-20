@@ -190,6 +190,22 @@ export async function fetchDocument(
     }
   }
 
+  // Google Docs requires a paragraph after every table, so a table at the very
+  // end of the document leaves a trailing empty paragraph. Empty plain paragraphs
+  // are already skipped above, but if the content before the table was a list, the
+  // filler inherits the bullet and serializes as an empty "- " block. Drop that
+  // trailing filler so content.txt stays clean and table-at-end commits verify.
+  const lastRaw = rawBlocks[rawBlocks.length - 1];
+  const prevRaw = rawBlocks[rawBlocks.length - 2];
+  if (
+    lastRaw &&
+    prevRaw?.type === "table" &&
+    lastRaw.type === "list_item" &&
+    /^\s*([-*]|\d+[.)])\s*$/.test(lastRaw.content)
+  ) {
+    rawBlocks.pop();
+  }
+
   // 6. Assign sequential block IDs and build Block objects
   const blocks: Block[] = rawBlocks.map((raw, i) => ({
     blockId: `blk_${i + 1}`,

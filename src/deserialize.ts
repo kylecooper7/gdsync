@@ -200,13 +200,21 @@ function buildTextStyleRequests(
  * Build requests to delete a block from the document.
  * Must be processed in reverse document order.
  */
-export function buildDeleteRequests(entry: BlockMapEntry): docs_v1.Schema$Request[] {
+export function buildDeleteRequests(
+  entry: BlockMapEntry,
+  isLastBlock = false
+): docs_v1.Schema$Request[] {
+  // The document's terminal newline can't be deleted. When removing the last
+  // block, stop one short of it; the resulting empty trailing paragraph is
+  // skipped on the next fetch.
+  const endIndex = isLastBlock ? entry.endIndex - 1 : entry.endIndex;
+  if (endIndex <= entry.startIndex) return [];
   return [
     {
       deleteContentRange: {
         range: {
           startIndex: entry.startIndex,
-          endIndex: entry.endIndex,
+          endIndex,
         },
       },
     },
@@ -319,11 +327,16 @@ export function buildModifyRequests(
  */
 export function buildInsertRequests(
   block: Block,
-  insertIndex: number
+  insertIndex: number,
+  atDocEnd = false
 ): { requests: docs_v1.Schema$Request[]; insertedLength: number } {
   const requests: docs_v1.Schema$Request[] = [];
 
-  // Insert a newline to create the new paragraph
+  // Insert a newline to create the new paragraph.
+  // Normally content is placed at the same index (before this newline). But when
+  // appending after the document's final paragraph, there is no index past the
+  // terminal newline to insert at, so we insert the newline AT the terminal
+  // position and place the content AFTER it (paraStart = insertIndex + 1).
   requests.push({
     insertText: {
       location: { index: insertIndex },
@@ -331,8 +344,8 @@ export function buildInsertRequests(
     },
   });
 
-  const paraStart = insertIndex;
-  const paraEnd = insertIndex + 1; // \n is the paragraph
+  const paraStart = atDocEnd ? insertIndex + 1 : insertIndex;
+  const paraEnd = paraStart + 1; // \n is the paragraph
 
   const { insertText: text, styleRequests } = prepareTextAndStyles(
     block,
@@ -380,14 +393,23 @@ export function buildInsertRequests(
 
   // Handle list bullets
   const listInfo = parseListPrefix(block.content);
+  const bulletEndIdx = paraStart + (text?.length ?? 0) + 1;
   if (listInfo) {
-    const endIdx = paraStart + (text?.length ?? 0) + 1;
     requests.push({
       createParagraphBullets: {
-        range: { startIndex: paraStart, endIndex: endIdx },
+        range: { startIndex: paraStart, endIndex: bulletEndIdx },
         bulletPreset: listInfo.isOrdered
           ? "NUMBERED_DECIMAL_ALPHA_ROMAN"
           : "BULLET_DISC_CIRCLE_SQUARE",
+      },
+    });
+  } else {
+    // A non-list paragraph inserted next to list content (e.g. right after a
+    // table that follows a list) can inherit the bullet. Explicitly clear it —
+    // deleteParagraphBullets is a no-op when there is no bullet.
+    requests.push({
+      deleteParagraphBullets: {
+        range: { startIndex: paraStart, endIndex: bulletEndIdx },
       },
     });
   }

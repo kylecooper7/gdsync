@@ -82,6 +82,13 @@ export async function commitDocument(
   const freshDoc = await (docs.documents.get({ documentId }) as unknown as Promise<{ data: docs_v1.Schema$Document }>);
   const freshNamedRanges = (freshDoc.data.namedRanges ?? {}) as Record<string, docs_v1.Schema$NamedRanges>;
 
+  // True document body end from the raw doc (not the block map, which omits the
+  // mandatory empty paragraph after a trailing table). Inserts must land before it.
+  const freshBodyEls = freshDoc.data.body?.content ?? [];
+  const docBodyEnd = freshBodyEls.length
+    ? freshBodyEls[freshBodyEls.length - 1].endIndex ?? 1
+    : 1;
+
   // Update block map entries with fresh positions
   const refreshedMap = new Map<string, BlockMapEntry>(session.blockMap);
   for (const [blockId, entry] of refreshedMap.entries()) {
@@ -210,12 +217,21 @@ export async function commitDocument(
     reqs.push(...strikethroughReqs, ...insertStyleReqs);
 
     // Additions: insert normally + apply red color
+    const docContentEnd = docBodyEnd;
+    const tableStarts = new Set(
+      [...refreshedMap.values()].filter((e) => e.type === "table").map((e) => e.startIndex)
+    );
     let indexShift = 0;
     for (const { block, insertAfterBlockId } of added) {
       let insertIndex: number;
+      let atBoundary = false;
       if (insertAfterBlockId) {
         const prevEntry = refreshedMap.get(insertAfterBlockId);
-        insertIndex = (prevEntry?.endIndex ?? 1) + indexShift;
+        const rawEndIndex = prevEntry?.endIndex ?? 1;
+        // Inserting text at the body end or a table start is invalid — insert at
+        // endIndex - 1 and place content after the newline (see auto mode).
+        atBoundary = rawEndIndex >= docContentEnd || tableStarts.has(rawEndIndex);
+        insertIndex = (atBoundary ? rawEndIndex - 1 : rawEndIndex) + indexShift;
       } else {
         insertIndex = 1 + indexShift;
       }
@@ -239,15 +255,17 @@ export async function commitDocument(
         }
         // Image handling omitted for brevity — same as auto mode
       } else {
-        const { requests: insertReqs, insertedLength } = buildInsertRequests(block, insertIndex);
+        const { requests: insertReqs, insertedLength } = buildInsertRequests(block, insertIndex, atBoundary);
         reqs.push(...insertReqs);
 
-        // Red color on the inserted text (skip the \n, color the text)
+        // Red color on the inserted text (skip the \n, color the text). When
+        // atBoundary, the content sits after the inserted newline.
+        const textStart = atBoundary ? insertIndex + 1 : insertIndex;
         const textLen = insertedLength - 1; // subtract the \n
         if (textLen > 0) {
           reqs.push({
             updateTextStyle: {
-              range: { startIndex: insertIndex, endIndex: insertIndex + textLen },
+              range: { startIndex: textStart, endIndex: textStart + textLen },
               textStyle: SUGGEST_RED,
               fields: "foregroundColor",
             },
@@ -291,10 +309,12 @@ export async function commitDocument(
 
     for (const op of ops) {
       if (op.kind === "delete") {
-        editRequests.push(...buildDeleteRequests(op.entry));
+        const isLastBlock = op.entry.endIndex >= docBodyEnd;
+        editRequests.push(...buildDeleteRequests(op.entry, isLastBlock));
+        const deletedEnd = isLastBlock ? op.entry.endIndex - 1 : op.entry.endIndex;
         positionDeltas.push({
           position: op.entry.startIndex,
-          delta: -(op.entry.endIndex - op.entry.startIndex),
+          delta: -(deletedEnd - op.entry.startIndex),
         });
       } else {
         const { block, oldBlock, entry } = op;
@@ -334,13 +354,27 @@ export async function commitDocument(
 
     // Insertions: adjust indices by cumulative shift from deletions/modifications
     const insertRequests: docs_v1.Schema$Request[] = [];
+    // Body content end — inserts must land strictly before this index (Google
+    // Docs rejects an index at/after the body's terminal newline).
+    const docContentEnd = docBodyEnd;
+    // Table start positions. Inserting text AT a table boundary is invalid, so
+    // an insert landing there is handled like an end-of-doc insert.
+    const tableStarts = new Set(
+      [...refreshedMap.values()].filter((e) => e.type === "table").map((e) => e.startIndex)
+    );
     let indexShift = 0;
     for (const { block, insertAfterBlockId } of added) {
       let insertIndex: number;
+      let atBoundary = false;
       if (insertAfterBlockId) {
         const prevEntry = refreshedMap.get(insertAfterBlockId);
         const rawEndIndex = prevEntry?.endIndex ?? 1;
-        insertIndex = rawEndIndex + cumulativeShiftAt(rawEndIndex) + indexShift;
+        // The anchor's endIndex is not a valid text-insertion point when it is
+        // the body end or the start of a table. In those cases insert at
+        // endIndex - 1 and let buildInsertRequests place content after the newline.
+        atBoundary = rawEndIndex >= docContentEnd || tableStarts.has(rawEndIndex);
+        const base = atBoundary ? rawEndIndex - 1 : rawEndIndex;
+        insertIndex = base + cumulativeShiftAt(rawEndIndex) + indexShift;
       } else {
         insertIndex = 1 + cumulativeShiftAt(1) + indexShift;
       }
@@ -375,7 +409,7 @@ export async function commitDocument(
         newTableContents.push(block.content);
         indexShift += rows * cols + rows + 1;
       } else {
-        const { requests: reqs, insertedLength } = buildInsertRequests(block, insertIndex);
+        const { requests: reqs, insertedLength } = buildInsertRequests(block, insertIndex, atBoundary);
         insertRequests.push(...reqs);
         indexShift += insertedLength;
       }
