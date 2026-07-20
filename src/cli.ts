@@ -15,6 +15,7 @@ import {
   startSetup,
   checkSetup,
   hasLocalCredentials,
+  authErrorHint,
 } from "./auth.js";
 import { fetchDocument } from "./fetch.js";
 import { commitDocument } from "./commit.js";
@@ -42,10 +43,15 @@ function getMentionFilter(config: Config): { email: string; name: string } | und
 
 const program = new Command();
 
+// Read version from package.json so `gdsync --version` always matches the release.
+const pkgVersion = JSON.parse(
+  fs.readFileSync(new URL("../package.json", import.meta.url), "utf8")
+).version as string;
+
 program
   .name("gdsync")
   .description("Sync a Google Doc to a local content file for AI agent editing")
-  .version("1.0.0");
+  .version(pkgVersion);
 
 // ---------------------------------------------------------------------------
 // gdsync init
@@ -381,7 +387,7 @@ program
       process.exit(0);
     } catch (err) {
       const e = err as Error & { exitCode?: number };
-      console.error("Fetch failed:", e.message);
+      console.error("Fetch failed:", e.message + authErrorHint(e.message));
       process.exit(e.exitCode ?? 1);
     }
   });
@@ -451,7 +457,7 @@ program
       }
     } catch (err) {
       const e = err as Error & { exitCode?: number };
-      console.error("Commit failed:", e.message);
+      console.error("Commit failed:", e.message + authErrorHint(e.message));
       if (e.message.includes("Image not found")) {
         const match = e.message.match(/block (blk_\d+)/);
         if (match) {
@@ -730,7 +736,7 @@ program
       process.exit(0);
     } catch (err) {
       const e = err as Error & { exitCode?: number };
-      console.error("Failed to list docs:", e.message);
+      console.error("Failed to list docs:", e.message + authErrorHint(e.message));
       process.exit(e.exitCode ?? 1);
     }
   });

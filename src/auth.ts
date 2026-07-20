@@ -43,6 +43,17 @@ type StoredCredentials = {
  * Load user-provided OAuth client credentials.
  * Returns null if no local credentials are configured.
  */
+/**
+ * Map common OAuth failures to an actionable hint. Returns "" when the error
+ * isn't a recognized credential problem.
+ */
+export function authErrorHint(message: string): string {
+  if (/deleted_client|invalid_client|invalid_grant|unauthorized_client/i.test(message)) {
+    return "\nYour Google credentials are no longer valid (the OAuth client may have been deleted or access revoked). Run `gdsync setup`, then `gdsync auth` to reconnect.";
+  }
+  return "";
+}
+
 function loadLocalClientSecret(): { client_id: string; client_secret: string } | null {
   // Tier 1: User-provided client_secret.json (power users / custom GCP projects)
   if (fs.existsSync(CLIENT_SECRET_PATH)) {

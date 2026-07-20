@@ -77,7 +77,7 @@ export function loadConfig(workDir: string): Config {
   const configPath = path.join(workDir, ".gdsync");
   if (!fs.existsSync(configPath)) {
     const err = new Error(
-      "No .gdsync config found. Run `gdsync start --doc <documentId>` first."
+      "No .gdsync config found. Run `gdsync init --doc <documentId>` first."
     ) as Error & { exitCode: number };
     err.exitCode = 1;
     throw err;
