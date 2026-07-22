@@ -299,12 +299,10 @@ function isComplexTable(table: DocTable): boolean {
 function cellText(cell: TableCell): string {
   const firstPara = cell.content.find((el) => el.paragraph);
   if (!firstPara?.paragraph) return "";
-  const text = firstPara.paragraph.elements
-    .map((el) => el.textRun?.content ?? "")
-    .join("")
-    .replace(/\n$/, "");
-  // Escape pipes so the cell text doesn't break the markdown table structure.
-  return text.replace(/\|/g, "\\|");
+  // Serialize with inline formatting (bold/italic/code/link) so cell styling
+  // round-trips, then escape pipes so it doesn't break the table structure.
+  const md = serializeParagraphElements(firstPara.paragraph.elements, () => "");
+  return md.replace(/\|/g, "\\|");
 }
 
 /**

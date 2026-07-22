@@ -127,4 +127,19 @@ describe("buildTableCellUpdateRequests — netDelta", () => {
     ]);
     expect(netDelta).toBe(0);
   });
+
+  it("inserts plain text and a style request for a formatted cell", () => {
+    const { requests, netDelta } = buildTableCellUpdateRequests(tableWithCell("x"), [
+      { rowIndex: 0, colIndex: 0, newText: "**bold**" },
+    ]);
+    const ins = requests.map(asAny).filter((r) => r.insertText);
+    // The doc holds plain text, not the markdown markers.
+    expect(ins[0].insertText.text).toBe("bold");
+    expect(netDelta).toBe(3); // "bold" (4) - "x" (1)
+    // A bold style is applied somewhere in the requests.
+    const hasBold = requests
+      .map(asAny)
+      .some((r) => r.updateTextStyle?.textStyle?.bold === true);
+    expect(hasBold).toBe(true);
+  });
 });

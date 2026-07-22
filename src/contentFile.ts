@@ -5,6 +5,18 @@
 import * as fs from "fs";
 import { Block, BlockType } from "./types.js";
 import { parseListPrefix } from "./lists.js";
+import { parseMarkdownTable } from "./tables.js";
+
+/**
+ * Whether two table markdown strings differ in row or column count (i.e. a
+ * row/column was added or removed). Such changes can't be applied surgically,
+ * so the caller recreates the table instead.
+ */
+function tableDimsChanged(oldContent: string, newContent: string): boolean {
+  const o = parseMarkdownTable(oldContent);
+  const n = parseMarkdownTable(newContent);
+  return o.headers.length !== n.headers.length || o.rows.length !== n.rows.length;
+}
 
 // Matches: ---blk_1--- or ---blk_1 token--- or ---blk_1 tok1 tok2---
 const BLOCK_DELIMITER_RE = /^---(blk_\d+)(?:\s+([\w-]+(?:\s+[\w-]+)*))?---$/;
@@ -207,7 +219,20 @@ export function diffBlocks(
     } else {
       const old = oldById.get(block.blockId);
       if (old) {
-        if (old.content !== block.content || !arraysEqual(old.styleTokens, block.styleTokens)) {
+        if (
+          old.type === "table" &&
+          block.type === "table" &&
+          !old.readonly &&
+          tableDimsChanged(old.content, block.content)
+        ) {
+          // Row/column added or removed — surgical structural edits aren't
+          // supported, so recreate the table (delete old + insert new).
+          deleted.push(block.blockId);
+          added.push({
+            block: { ...block, blockId: null },
+            insertAfterBlockId: findStableAnchor(i),
+          });
+        } else if (old.content !== block.content || !arraysEqual(old.styleTokens, block.styleTokens)) {
           modified.push({ block, oldBlock: old });
         }
       } else {

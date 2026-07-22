@@ -131,7 +131,7 @@ function alignmentValue(token: string): string | null {
  * Emit updateTextStyle requests for all styled spans.
  * docStartIndex is the paragraph's start position in the document.
  */
-function buildTextStyleRequests(
+export function buildTextStyleRequests(
   spans: StyleSpan[],
   docStartIndex: number
 ): docs_v1.Schema$Request[] {

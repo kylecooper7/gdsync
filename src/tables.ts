@@ -3,6 +3,7 @@
  */
 
 import { docs_v1 } from "googleapis";
+import { parseInlineMarkdown, buildTextStyleRequests } from "./deserialize.js";
 
 export type ParsedTable = {
   headers: string[];
@@ -190,17 +191,27 @@ export function buildTableCellUpdateRequests(
       });
     }
 
-    // Insert new text
-    if (change.newText) {
+    // Insert new text with inline formatting (bold / italic / code / link).
+    // parseInlineMarkdown is inline-only, so a leading "#" or "-" stays literal.
+    const { plainText, spans } = parseInlineMarkdown(change.newText ?? "");
+    if (plainText) {
       requests.push({
-        insertText: {
-          location: { index: paraStart },
-          text: change.newText,
+        insertText: { location: { index: paraStart }, text: plainText },
+      });
+      // Reset inherited inline styles on the inserted range, then apply the
+      // cell's own spans (mirrors how paragraph text is styled).
+      requests.push({
+        updateTextStyle: {
+          range: { startIndex: paraStart, endIndex: paraStart + plainText.length },
+          textStyle: {},
+          fields: "bold,italic,link,weightedFontFamily",
         },
       });
+      requests.push(...buildTextStyleRequests(spans, paraStart));
     }
 
-    netDelta += (change.newText?.length ?? 0) - oldLen;
+    // The doc holds the plain text (styling is metadata), so shifts use its length.
+    netDelta += plainText.length - oldLen;
   }
 
   return { requests, netDelta };

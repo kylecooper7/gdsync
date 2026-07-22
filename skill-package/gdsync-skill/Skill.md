@@ -74,7 +74,7 @@ Text with **bold**, *italic*, `code`, [link](url).
 - **Delete:** remove delimiter + content
 - **Reorder:** move delimiter + content to new position
 - Don't change type tokens or assign block IDs
-- Tables: edit cells only, no row/column changes. Don't edit `readonly` blocks.
+- Tables: edit cell text (with `**bold**`/`*italic*`/`` `code` ``/`[link](url)` inside cells), and add or remove rows/columns by editing the markdown grid. Escape a literal pipe in a cell as `\|`. Don't edit `readonly` blocks (complex tables).
 - Images: file must exist in `assets/` before commit
 
 ## Comments

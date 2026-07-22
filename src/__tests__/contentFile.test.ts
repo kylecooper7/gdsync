@@ -162,6 +162,32 @@ describe("diffBlocks", () => {
     expect(diff.added[0].insertAfterBlockId).toBe("blk_1");
   });
 
+  const makeTable = (id: string | null, content: string) => ({
+    blockId: id,
+    content,
+    styleTokens: [] as string[],
+    readonly: false,
+    type: "table" as const,
+  });
+
+  it("treats a table row/column change as recreate (delete + add)", () => {
+    const t2 = "| A | B |\n| --- | --- |\n| 1 | 2 |";
+    const t3rows = "| A | B |\n| --- | --- |\n| 1 | 2 |\n| 3 | 4 |"; // added a row
+    const diff = diffBlocks([makeTable("blk_1", t2)], [makeTable("blk_1", t3rows)]);
+    expect(diff.deleted).toContain("blk_1");
+    expect(diff.added).toHaveLength(1);
+    expect(diff.modified).toHaveLength(0);
+  });
+
+  it("treats a same-dimension table cell edit as a modify", () => {
+    const before = "| A | B |\n| --- | --- |\n| 1 | 2 |";
+    const after = "| A | B |\n| --- | --- |\n| 1 | 99 |"; // same dims, cell changed
+    const diff = diffBlocks([makeTable("blk_1", before)], [makeTable("blk_1", after)]);
+    expect(diff.modified).toHaveLength(1);
+    expect(diff.deleted).toHaveLength(0);
+    expect(diff.added).toHaveLength(0);
+  });
+
   it("detects agent-assigned ID as new block", () => {
     const old = [makeBlock("blk_1", "Hello")];
     const updated = [makeBlock("blk_1", "Hello"), makeBlock("blk_99", "Agent wrote this")];
