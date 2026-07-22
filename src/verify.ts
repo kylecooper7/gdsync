@@ -6,6 +6,7 @@ import { OAuth2Client } from "google-auth-library";
 import { fetchDocument } from "./fetch.js";
 import { SessionState } from "./types.js";
 import { Block } from "./types.js";
+import { canonicalizeTableContent } from "./tables.js";
 
 export type VerifyResult = {
   success: boolean;
@@ -48,8 +49,17 @@ export async function verifyDocument(
 
   const len = Math.min(committedBlocks.length, freshBlocks.length);
   for (let i = 0; i < len; i++) {
-    const expected = committedBlocks[i].content.trim();
-    const got = freshBlocks[i].content.trim();
+    // Tables are compared by canonical form so lenient agent input (missing
+    // separator, uneven columns, spacing) that gdsync normalizes on render
+    // doesn't read as a mismatch.
+    const isTable =
+      committedBlocks[i].type === "table" || freshBlocks[i].type === "table";
+    const expected = isTable
+      ? canonicalizeTableContent(committedBlocks[i].content)
+      : committedBlocks[i].content.trim();
+    const got = isTable
+      ? canonicalizeTableContent(freshBlocks[i].content)
+      : freshBlocks[i].content.trim();
     if (expected !== got) {
       diff.push({
         blockId: freshBlocks[i].blockId ?? `blk_${i + 1}`,

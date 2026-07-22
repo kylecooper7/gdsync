@@ -303,7 +303,8 @@ function cellText(cell: TableCell): string {
     .map((el) => el.textRun?.content ?? "")
     .join("")
     .replace(/\n$/, "");
-  return text;
+  // Escape pipes so the cell text doesn't break the markdown table structure.
+  return text.replace(/\|/g, "\\|");
 }
 
 /**

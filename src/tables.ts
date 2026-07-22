@@ -14,6 +14,29 @@ export type ParsedTable = {
  * Row 0 is headers; subsequent rows are data rows.
  * The separator row (| --- | --- |) is excluded.
  */
+/**
+ * Normalize a markdown table to canonical form: `| a | b |` rows, a `| --- |`
+ * separator, and every row padded/truncated to the header's column count.
+ * Used so verification tolerates lenient agent input (missing separator, uneven
+ * columns, odd spacing) that gdsync normalizes when it renders the table.
+ */
+export function canonicalizeTableContent(content: string): string {
+  const { headers, rows } = parseMarkdownTable(content);
+  if (headers.length === 0) return content.trim();
+  const cols = headers.length;
+  const fit = (row: string[]): string[] => {
+    const r = row.slice(0, cols);
+    while (r.length < cols) r.push("");
+    return r;
+  };
+  const lines = [
+    "| " + fit(headers).join(" | ") + " |",
+    "| " + headers.map(() => "---").join(" | ") + " |",
+    ...rows.map((row) => "| " + fit(row).join(" | ") + " |"),
+  ];
+  return lines.join("\n");
+}
+
 export function parseMarkdownTable(markdown: string): ParsedTable {
   const lines = markdown.split("\n").filter((l) => l.trim().startsWith("|"));
 
@@ -23,9 +46,9 @@ export function parseMarkdownTable(markdown: string): ParsedTable {
 
   const parseRow = (line: string): string[] =>
     line
-      .split("|")
+      .split(/(?<!\\)\|/) // split on unescaped pipes only
       .slice(1, -1) // remove leading/trailing empty segments
-      .map((cell) => cell.trim());
+      .map((cell) => cell.trim().replace(/\\\|/g, "|")); // unescape \| -> |
 
   const isSeparator = (line: string) => /^\|[\s\-:|]+\|$/.test(line.replace(/\s/g, ""));
 

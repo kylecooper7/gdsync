@@ -1,5 +1,38 @@
 import { describe, it, expect } from "vitest";
-import { parseMarkdownTable, diffTables, validateTableDimensions, allCellsAsChanges } from "../tables.js";
+import { parseMarkdownTable, diffTables, validateTableDimensions, allCellsAsChanges, canonicalizeTableContent } from "../tables.js";
+
+describe("parseMarkdownTable — escaped pipes", () => {
+  it("keeps an escaped pipe as literal cell content", () => {
+    const md = `| Expr | Meaning |
+| --- | --- |
+| a \\| b | a or b |`;
+    const parsed = parseMarkdownTable(md);
+    expect(parsed.rows[0]).toEqual(["a | b", "a or b"]);
+  });
+});
+
+describe("canonicalizeTableContent — verify tolerance", () => {
+  it("adds a missing separator row", () => {
+    const md = `| A | B |
+| 1 | 2 |`;
+    expect(canonicalizeTableContent(md)).toBe("| A | B |\n| --- | --- |\n| 1 | 2 |");
+  });
+
+  it("pads a short row and truncates a long row to the header width", () => {
+    const md = `| X | Y | Z |
+| --- | --- | --- |
+| 1 | 2 |
+| 4 | 5 | 6 | 7 |`;
+    expect(canonicalizeTableContent(md)).toBe(
+      "| X | Y | Z |\n| --- | --- | --- |\n| 1 | 2 |  |\n| 4 | 5 | 6 |"
+    );
+  });
+
+  it("is idempotent on already-canonical tables", () => {
+    const md = "| A | B |\n| --- | --- |\n| 1 | 2 |";
+    expect(canonicalizeTableContent(md)).toBe(md);
+  });
+});
 
 describe("parseMarkdownTable", () => {
   it("parses a simple 2-column table", () => {
