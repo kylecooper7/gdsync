@@ -73,9 +73,10 @@ Text with **bold**, *italic*, `code`, [link](url).
 - **Add:** insert bare `---` (no ID) where you want new content
 - **Delete:** remove delimiter + content
 - **Reorder:** move delimiter + content to new position
+- **Spacing:** insert an empty `---` block (a blank line) to add vertical space between sections
 - Don't change type tokens or assign block IDs
 - Tables: edit cell text (with `**bold**`/`*italic*`/`` `code` ``/`[link](url)` inside cells), and add or remove rows/columns by editing the markdown grid. Escape a literal pipe in a cell as `\|`. Don't edit `readonly` blocks (complex tables).
-- Images: file must exist in `assets/` before commit
+- Images: reference a local file in `assets/` (must exist before commit) or a public URL, e.g. `![alt](https://example.com/img.png)`. Center or right-align with a `text-center` / `text-right` token, e.g. `--- text-center---`.
 
 ## Comments
 
