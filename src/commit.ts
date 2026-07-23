@@ -12,6 +12,7 @@ import {
   buildInsertRequests,
   prepareTextAndStyles,
   namedStyleType,
+  alignmentValue,
 } from "./deserialize.js";
 import { getDocsClient, lookupNamedRange } from "./namedRanges.js";
 import { checkImageFiles, uploadImageToDrive, deleteDriveFile } from "./images.js";
@@ -430,6 +431,18 @@ export async function commitDocument(
               objectSize: { width: { magnitude: 180, unit: "PT" } },
             },
           });
+          // Apply paragraph alignment (e.g. text-center) to the image's paragraph.
+          const alignToken = block.styleTokens.find((t) => t.startsWith("text-"));
+          const alignment = alignToken ? alignmentValue(alignToken) : null;
+          if (alignment) {
+            insertRequests.push({
+              updateParagraphStyle: {
+                range: { startIndex: imgIndex, endIndex: imgIndex + 1 },
+                paragraphStyle: { alignment },
+                fields: "alignment",
+              },
+            });
+          }
           indexShift += 2; // newline + image
         }
       } else if (block.type === "table") {

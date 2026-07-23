@@ -114,7 +114,7 @@ function stripHeadingPrefix(content: string): string {
   return content.replace(/^#{1,6} /, "");
 }
 
-function alignmentValue(token: string): string | null {
+export function alignmentValue(token: string): string | null {
   switch (token) {
     case "text-left":
       return "START";
