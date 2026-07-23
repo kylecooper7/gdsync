@@ -101,7 +101,10 @@ export async function uploadImageToDrive(
     },
   });
 
-  const publicUrl = `https://drive.google.com/uc?export=view&id=${fileId}`;
+  // Direct-image URL that Google Docs can fetch server-side. The older
+  // `drive.google.com/uc?export=view` endpoint now returns an HTML interstitial,
+  // so insertInlineImage fails with "image not found".
+  const publicUrl = `https://lh3.googleusercontent.com/d/${fileId}`;
   return { driveFileId: fileId, publicUrl };
 }
 

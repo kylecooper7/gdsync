@@ -50,10 +50,14 @@ export async function commitDocument(
 
   // 3. Validate image files exist before any API calls
   const imageRefs = extractImageRefs(currentBlocks);
-  const missingImages = checkImageFiles(imageRefs.map((r) => ({
-    blockId: r.blockId,
-    localPath: path.join(workDir, r.localPath),
-  })));
+  const missingImages = checkImageFiles(
+    imageRefs
+      .filter((r) => !/^https?:\/\//i.test(r.localPath)) // remote URLs need no local file
+      .map((r) => ({
+        blockId: r.blockId,
+        localPath: path.join(workDir, r.localPath),
+      }))
+  );
 
   if (missingImages.length > 0) {
     const first = missingImages[0];
@@ -114,6 +118,9 @@ export async function commitDocument(
 
   let allRequests: docs_v1.Schema$Request[];
   const newTableContents: string[] = [];
+  // Drive files backing inserted images — deleted only AFTER the batchUpdate
+  // embeds them, so the image isn't gone before Docs fetches it.
+  const driveFileIdsToDelete: string[] = [];
 
   if (isSuggestionsMode) {
     // -----------------------------------------------------------------------
@@ -389,24 +396,41 @@ export async function commitDocument(
       if (block.type === "image") {
         const imageRef = extractImageRefs([block])[0];
         if (imageRef) {
-          const localAbsPath = path.join(workDir, imageRef.localPath);
-          try {
-            const { driveFileId, publicUrl } = await uploadImageToDrive(auth, localAbsPath);
-            insertRequests.push({
-              insertInlineImage: {
-                location: { index: insertIndex },
-                uri: publicUrl,
-                objectSize: { width: { magnitude: 300, unit: "PT" } },
-              },
-            });
-            deleteDriveFile(auth, driveFileId).catch(() => {});
-            indexShift += 1;
-          } catch (err) {
-            throw Object.assign(
-              new Error(`Failed to upload image ${imageRef.localPath}: ${(err as Error).message}`),
-              { exitCode: 4 }
-            );
+          const isRemote = /^https?:\/\//i.test(imageRef.localPath);
+          let uri: string;
+          if (isRemote) {
+            // Insert directly from a public URL — no Drive round-trip needed.
+            uri = imageRef.localPath;
+          } else {
+            try {
+              const { driveFileId, publicUrl } = await uploadImageToDrive(
+                auth,
+                path.join(workDir, imageRef.localPath)
+              );
+              uri = publicUrl;
+              // Delete AFTER the batchUpdate embeds the image (not before).
+              driveFileIdsToDelete.push(driveFileId);
+            } catch (err) {
+              throw Object.assign(
+                new Error(`Failed to upload image ${imageRef.localPath}: ${(err as Error).message}`),
+                { exitCode: 4 }
+              );
+            }
           }
+          // Give the image its own paragraph (a newline), then place the image.
+          // When at the document/table boundary, put the image after the newline.
+          const imgIndex = atBoundary ? insertIndex + 1 : insertIndex;
+          insertRequests.push({
+            insertText: { location: { index: insertIndex }, text: "\n" },
+          });
+          insertRequests.push({
+            insertInlineImage: {
+              location: { index: imgIndex },
+              uri,
+              objectSize: { width: { magnitude: 300, unit: "PT" } },
+            },
+          });
+          indexShift += 2; // newline + image
         }
       } else if (block.type === "table") {
         const parsed = parseMarkdownTable(block.content);
@@ -431,6 +455,11 @@ export async function commitDocument(
       documentId,
       requestBody: { requests: allRequests },
     });
+  }
+
+  // Now that images are embedded, clean up their temporary Drive files.
+  for (const fileId of driveFileIdsToDelete) {
+    deleteDriveFile(auth, fileId).catch(() => {});
   }
 
   // 7. Fill newly inserted tables with cell content

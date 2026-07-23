@@ -115,7 +115,9 @@ export async function fetchDocument(
         altTextResolver
       );
 
-      if (!content && !isImage) continue; // skip empty paragraphs silently? actually keep them per spec
+      // Empty paragraphs are kept — they represent intentional blank-line spacers.
+      // Structural filler (the mandatory empty paragraph after a table) is dropped
+      // in the post-processing pass below.
 
       const type: BlockType = isImage
         ? "image"
@@ -196,14 +198,20 @@ export async function fetchDocument(
   // block. Drop any empty list-item that immediately follows a table (it's always
   // an artifact, never user content) so content.txt stays clean and commits verify.
   const emptyBullet = /^\s*([-*]|\d+[.)])\s*$/;
+  const isEmptyFiller = (raw: (typeof rawBlocks)[number]): boolean =>
+    (raw.type === "paragraph" && raw.content.trim() === "") ||
+    (raw.type === "list_item" && emptyBullet.test(raw.content));
   const dedupedRaw = rawBlocks.filter((raw, i) => {
-    const prev = rawBlocks[i - 1];
-    const isEmptyBulletAfterTable =
-      prev?.type === "table" &&
-      raw.type === "list_item" &&
-      emptyBullet.test(raw.content);
-    return !isEmptyBulletAfterTable;
+    // Drop the mandatory empty filler block Google inserts right after a table
+    // (keeps content.txt clean; intentional spacers elsewhere are preserved).
+    const isFillerAfterTable = rawBlocks[i - 1]?.type === "table" && isEmptyFiller(raw);
+    return !isFillerAfterTable;
   });
+  // Drop trailing empty blocks — the document's final-paragraph artifact. Blank-line
+  // spacers between real content are kept; only insignificant trailing ones go.
+  while (dedupedRaw.length && isEmptyFiller(dedupedRaw[dedupedRaw.length - 1])) {
+    dedupedRaw.pop();
+  }
   rawBlocks.length = 0;
   rawBlocks.push(...dedupedRaw);
 

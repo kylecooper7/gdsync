@@ -49,6 +49,12 @@ export async function verifyDocument(
 
   const len = Math.min(committedBlocks.length, freshBlocks.length);
   for (let i = 0; i < len; i++) {
+    // Images transform on insert — a URL or local path becomes a downloaded
+    // asset and the alt text is normalized — so compare image blocks by type,
+    // not exact content.
+    if (committedBlocks[i].type === "image" && freshBlocks[i].type === "image") {
+      continue;
+    }
     // Tables are compared by canonical form so lenient agent input (missing
     // separator, uneven columns, spacing) that gdsync normalizes on render
     // doesn't read as a mismatch.

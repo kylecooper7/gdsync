@@ -302,7 +302,8 @@ function arraysEqual(a: string[], b: string[]): boolean {
  */
 export function extractImageRefs(blocks: Block[]): Array<{ blockId: string | null; localPath: string }> {
   const refs: Array<{ blockId: string | null; localPath: string }> = [];
-  const imageRe = /!\[.*?\]\((assets\/[^)]+)\)/;
+  // Accept a local assets/ path OR a remote http(s) URL.
+  const imageRe = /!\[.*?\]\(([^)]+)\)/;
   for (const block of blocks) {
     if (block.type === "image") {
       const m = block.content.match(imageRe);

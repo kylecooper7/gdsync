@@ -1,6 +1,20 @@
 import { describe, it, expect } from "vitest";
-import { parseContentString, diffBlocks, writeContentFile } from "../contentFile.js";
+import { parseContentString, diffBlocks, writeContentFile, extractImageRefs } from "../contentFile.js";
 import { Block } from "../types.js";
+
+describe("extractImageRefs", () => {
+  const img = (content: string): Block => ({
+    blockId: "blk_1", content, styleTokens: [], readonly: false, type: "image",
+  });
+  it("extracts a local assets/ path", () => {
+    expect(extractImageRefs([img("![x](assets/img_001.png)")])[0].localPath).toBe("assets/img_001.png");
+  });
+  it("extracts a remote http(s) URL", () => {
+    expect(extractImageRefs([img("![gdsync](https://gdsync.dev/logo-text.png)")])[0].localPath).toBe(
+      "https://gdsync.dev/logo-text.png"
+    );
+  });
+});
 import * as fs from "fs";
 import * as path from "path";
 import * as os from "os";
