@@ -427,13 +427,24 @@ export function prepareTextAndStyles(
   block: Block,
   docStartIndex: number
 ): { plainText: string; insertText: string | null; styleRequests: docs_v1.Schema$Request[] } {
-  let rawContent = block.content;
+  let base = block.content;
+
+  // Whole-block strikethrough (e.g. suggestions-mode deleted text): unwrap ~~...~~
+  // and remember to apply strikethrough across the paragraph.
+  let struck = false;
+  const strikeMatch = base.match(/^~~([\s\S]+)~~$/);
+  if (strikeMatch) {
+    struck = true;
+    base = strikeMatch[1];
+  }
+
+  let rawContent = base;
 
   // Strip heading prefix
   rawContent = stripHeadingPrefix(rawContent);
 
   // Strip list prefix and add nesting tabs
-  const listInfo = parseListPrefix(block.content);
+  const listInfo = parseListPrefix(base);
   if (listInfo) {
     rawContent = stripListPrefix(rawContent);
     rawContent = addNestingTabs(rawContent, listInfo.nestingLevel);
@@ -462,13 +473,24 @@ export function prepareTextAndStyles(
           endIndex: docStartIndex + plainText.length,
         },
         textStyle: {},
-        fields: "bold,italic,link,weightedFontFamily",
+        fields: "bold,italic,link,weightedFontFamily,strikethrough",
       },
     });
   }
 
   // Then apply specific inline styles on their respective spans
   styleRequests.push(...buildTextStyleRequests(spans, docStartIndex));
+
+  // Whole-block strikethrough (unwrapped from ~~...~~ above).
+  if (struck && plainText) {
+    styleRequests.push({
+      updateTextStyle: {
+        range: { startIndex: docStartIndex, endIndex: docStartIndex + plainText.length },
+        textStyle: { strikethrough: true },
+        fields: "strikethrough",
+      },
+    });
+  }
 
   return {
     plainText,

@@ -138,7 +138,7 @@ Filter to @mentioned comments only: `gdsync config comment_filter on`
 
 **Auto** (default) — changes applied directly to the Google Doc.
 
-**Suggestions** — changes appear as visual suggestions (strikethrough + red text). The document owner reviews and accepts/rejects.
+**Suggestions** — a **visual review preview**: old/removed text is struck through and new text is shown in red. Because the Google Docs API can't create native suggestions, this is a simulation (not Google's "Suggesting" mode — there are no Accept/Reject buttons). After committing, a re-fetch shows both versions; the struck old text appears as `~~...~~` in `content.txt`. To **accept** a change, delete the struck-through block; to **reject** it, delete the new text.
 
 ```bash
 gdsync config mode suggestions

@@ -7,6 +7,7 @@
 type TextStyle = {
   bold?: boolean;
   italic?: boolean;
+  strikethrough?: boolean;
   link?: { url: string };
   weightedFontFamily?: { fontFamily: string };
 };
@@ -260,6 +261,16 @@ export function serializeParagraph(
       const prefix = headingPrefix(namedStyleType);
       content = prefix + content;
     }
+  }
+
+  // Wrap fully struck-through text (e.g. suggestions-mode "deleted" old text) in
+  // ~~...~~ so the strikethrough is visible and round-trips in content.txt.
+  const allStruck =
+    !isImage &&
+    nonEmptyElements.length > 0 &&
+    nonEmptyElements.every((el) => el.textRun?.textStyle?.strikethrough === true);
+  if (allStruck && content.trim()) {
+    content = `~~${content}~~`;
   }
 
   // Determine alignment style token

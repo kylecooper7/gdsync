@@ -92,10 +92,16 @@ gdsync comment create <blockId> "<message>" --anchor "<text>"
 ## Settings
 
 ```bash
-gdsync config mode suggestions   # strikethrough + red visual suggestions
+gdsync config mode suggestions   # propose changes as a visual review (see below)
 gdsync config mode auto          # direct edits (default)
 gdsync config comment_filter on  # only show @mentioned comments
 ```
+
+### Suggestions mode
+
+The Google Docs API can't create native suggestions, so gdsync simulates them: on commit, **old/removed text is struck through and new text is shown in red** as a review preview for the human — it is NOT native Google Docs "Suggesting" mode (no Accept/Reject buttons).
+
+Important for editing: after a suggestions commit, a re-fetch shows **both** versions. The struck-through old text appears wrapped in `~~...~~`, and the new text sits in a separate block. The human accepts a change by **deleting the `~~struck~~` block**, or rejects it by deleting the new text. Don't be confused by the duplicated content — that's the review preview. Prefer auto mode unless the user explicitly wants to review changes before they apply.
 
 ## Rules
 

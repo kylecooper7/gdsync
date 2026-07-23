@@ -451,7 +451,8 @@ program
         // so a strict content match is expected to differ. Don't treat that as
         // a failure — the changes are in the doc as suggestions.
         console.log(
-          "Suggestions added. Review and accept them in Google Docs — the document will differ from the committed text until then."
+          "Proposed changes added as visual edits — old text struck through (~~like this~~), new text in red. " +
+          "This is a review preview, not native Google Docs suggestions. To accept: delete the struck-through blocks. To reject: delete the new red text."
         );
         process.exit(0);
       }
