@@ -427,7 +427,7 @@ export async function commitDocument(
             insertInlineImage: {
               location: { index: imgIndex },
               uri,
-              objectSize: { width: { magnitude: 300, unit: "PT" } },
+              objectSize: { width: { magnitude: 180, unit: "PT" } },
             },
           });
           indexShift += 2; // newline + image

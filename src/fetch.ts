@@ -202,10 +202,17 @@ export async function fetchDocument(
     (raw.type === "paragraph" && raw.content.trim() === "") ||
     (raw.type === "list_item" && emptyBullet.test(raw.content));
   const dedupedRaw = rawBlocks.filter((raw, i) => {
-    // Drop the mandatory empty filler block Google inserts right after a table
-    // (keeps content.txt clean; intentional spacers elsewhere are preserved).
-    const isFillerAfterTable = rawBlocks[i - 1]?.type === "table" && isEmptyFiller(raw);
-    return !isFillerAfterTable;
+    // Drop an empty *bulleted* filler after a table (Google's mandatory post-table
+    // paragraph that inherited a list bullet). An empty *paragraph* after a table is
+    // kept — it's an intentional blank-line spacer. Trailing filler is popped below.
+    const isBulletFillerAfterTable =
+      rawBlocks[i - 1]?.type === "table" &&
+      raw.type === "list_item" &&
+      emptyBullet.test(raw.content);
+    // Drop an empty block immediately before a table — filler produced when a
+    // table is inserted at the end of the document.
+    const isFillerBeforeTable = rawBlocks[i + 1]?.type === "table" && isEmptyFiller(raw);
+    return !isBulletFillerAfterTable && !isFillerBeforeTable;
   });
   // Drop trailing empty blocks — the document's final-paragraph artifact. Blank-line
   // spacers between real content are kept; only insignificant trailing ones go.
