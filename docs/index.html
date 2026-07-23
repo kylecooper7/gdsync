@@ -27,6 +27,12 @@ pre { background: #1e1e1e; color: #d4d4d4; padding: 1.25rem; border-radius: 8px;
 .feature { background: white; border-radius: 8px; padding: 1.15rem; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
 .feature h3 { font-size: 0.95rem; margin-bottom: 0.2rem; color: #202124; }
 .feature p { font-size: 0.85rem; color: #5f6368; margin: 0; }
+.demo { text-align: center; margin-bottom: 2rem; }
+.demo .demo-label { display: inline-block; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #5b4cc4; background: #efeafc; padding: 0.28rem 0.7rem; border-radius: 999px; margin-bottom: 0.75rem; }
+.demo h2 { font-size: 1.4rem; margin-bottom: 0.35rem; }
+.demo p.sub { color: #5f6368; font-size: 0.95rem; margin-bottom: 1.25rem; }
+.demo-card { border-radius: 16px; overflow: hidden; box-shadow: 0 18px 48px rgba(20,30,80,0.22); border: 1px solid #e3e6ec; background: #000; line-height: 0; }
+.demo-card video { width: 100%; height: auto; display: block; }
 footer { text-align: center; padding: 2rem; color: #5f6368; font-size: 0.85rem; }
 footer a { color: #1a6fe8; text-decoration: none; }
 @media (max-width: 600px) { .features { grid-template-columns: 1fr; } .hero h1 { font-size: 1.75rem; } }
@@ -49,6 +55,18 @@ footer a { color: #1a6fe8; text-decoration: none; }
 </div>
 
 <div class="container">
+  <div class="demo">
+    <span class="demo-label">▶ Live demo</span>
+    <h2>See it in action</h2>
+    <p class="sub">An AI agent writes this document live, then edits it and replies to a comment — right inside Google Docs.</p>
+    <div class="demo-card">
+      <video controls autoplay muted loop playsinline preload="metadata">
+        <source src="gdsync-demo.mp4" type="video/mp4">
+        Your browser doesn't support embedded video — <a href="gdsync-demo.mp4">download the demo</a>.
+      </video>
+    </div>
+  </div>
+
   <div class="card">
     <h2>How it works</h2>
     <p>gdsync syncs a Google Doc to a local file. The agent edits the file, runs a command, and changes appear in the live document.</p>
