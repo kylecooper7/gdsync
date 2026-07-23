@@ -280,10 +280,10 @@ gdsync comment resolve &lt;threadId&gt; --reply "Fixed."</code></pre>
 
 <section id="modes">
 <h2>Edit modes</h2>
-<p><strong>Auto</strong> (default) applies changes directly to the document. <strong>Suggestions</strong> mode records them as tracked changes — old text struck through, new text in red — for a human to accept or reject in Google Docs.</p>
+<p><strong>Auto</strong> (default) applies changes directly to the document. <strong>Suggestions</strong> mode is a <strong>visual review preview</strong> — old/removed text is struck through and new text is shown in red. The Google Docs API can't create native suggestions, so this is a simulation, <em>not</em> Google's "Suggesting" mode (there are no Accept/Reject buttons).</p>
 <pre><code>gdsync config mode suggestions
 gdsync config mode auto</code></pre>
-<div class="note">In suggestions mode the live document intentionally differs from <code>content.txt</code> until the human accepts the changes, so gdsync reports "Suggestions added" instead of an exact match.</div>
+<div class="note">After a suggestions commit, the document shows both versions. On the next fetch, the struck-through old text appears as <code>~~...~~</code> in <code>content.txt</code>. To <strong>accept</strong> a change, delete the struck-through block; to <strong>reject</strong> it, delete the new text.</div>
 </section>
 
 <section id="config">
