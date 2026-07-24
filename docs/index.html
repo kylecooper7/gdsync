@@ -5,6 +5,23 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="google-site-verification" content="pwqey5vMcgO5WGbg8Q-6juIfN0wVOCLubGqeIvZ2Knk" />
 <title>gdsync — Google Docs for AI Agents</title>
+<meta name="description" content="gdsync lets AI agents read and edit your Google Docs — fetch, edit, commit. Open-source CLI + skill, through your own Google Cloud project.">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+<link rel="icon" type="image/png" href="icon.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="theme-color" content="#1a6fe8">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="gdsync">
+<meta property="og:url" content="https://gdsync.dev/">
+<meta property="og:title" content="gdsync — Google Docs for AI Agents">
+<meta property="og:description" content="Let AI agents read and edit your Google Docs — fetch, edit, commit. Open-source, through your own Google Cloud project.">
+<meta property="og:image" content="https://gdsync.dev/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="gdsync — Google Docs for AI Agents">
+<meta name="twitter:description" content="Let AI agents read and edit your Google Docs — fetch, edit, commit. Open-source, through your own Google Cloud project.">
+<meta name="twitter:image" content="https://gdsync.dev/og-image.png">
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { font-family: system-ui, -apple-system, sans-serif; background: #f8f9fa; color: #202124; line-height: 1.7; }
@@ -27,6 +44,7 @@ pre { background: #1e1e1e; color: #d4d4d4; padding: 1.25rem; border-radius: 8px;
 .feature { background: white; border-radius: 8px; padding: 1.15rem; box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
 .feature h3 { font-size: 0.95rem; margin-bottom: 0.2rem; color: #202124; }
 .feature p { font-size: 0.85rem; color: #5f6368; margin: 0; }
+.demo-section { max-width: 940px; margin: 0 auto; padding: 2.5rem 2rem 0.5rem; }
 .demo { text-align: center; margin-bottom: 2rem; }
 .demo .demo-label { display: inline-block; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: #5b4cc4; background: #efeafc; padding: 0.28rem 0.7rem; border-radius: 999px; margin-bottom: 0.75rem; }
 .demo h2 { font-size: 1.4rem; margin-bottom: 0.35rem; }
@@ -54,7 +72,7 @@ footer a { color: #1a6fe8; text-decoration: none; }
   <p style="margin-top:1.5rem;font-size:0.85rem;color:#5f6368"><a href="privacy.html" style="color:#5f6368">Privacy Policy</a> &middot; <a href="terms.html" style="color:#5f6368">Terms of Service</a></p>
 </div>
 
-<div class="container">
+<div class="demo-section">
   <div class="demo">
     <span class="demo-label">▶ Live demo</span>
     <h2>See it in action</h2>
@@ -66,7 +84,9 @@ footer a { color: #1a6fe8; text-decoration: none; }
       </video>
     </div>
   </div>
+</div>
 
+<div class="container">
   <div class="card">
     <h2>How it works</h2>
     <p>gdsync syncs a Google Doc to a local file. The agent edits the file, runs a command, and changes appear in the live document.</p>
